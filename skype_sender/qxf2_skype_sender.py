@@ -27,7 +27,7 @@ def post_message(event, context=None):
     print(f'The trigger event is: {event}')
     full_msg = get_dict(event['Records'][0]['body'])
     if 'msg' in full_msg.keys():
-        msg = SkypeMsg.html(full_msg['msg'])
+        msg = full_msg['msg']
         channel_id = get_channel_id(full_msg)
         skype_handler = Skype(os.environ.get('SKYPE_USERNAME'), os.environ.get('SKYPE_PASSWORD'))
         channel = skype_handler.chats.chat(channel_id)

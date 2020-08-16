@@ -4,7 +4,7 @@ on:
     branches:
       - master
     paths:
-      - 'skype_sender/**'
+      - 'skype_sender_1/**'
 jobs:
   build:
     runs-on: ubuntu-latest
