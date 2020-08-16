@@ -13,7 +13,6 @@ jobs:
     - name: Deploy code to Lambda
       uses: mariamrf/py-lambda-action@v1.0.0
       with:
-        lambda_layer_arn: ${{ secrets.SKYPE_SENDER_ARN }}
         lambda_function_name: ${{ secrets.SKYPE_SENDER_FUNCTION }}
         requirements_txt: 'skype_sender/requirements.txt'
       env:
