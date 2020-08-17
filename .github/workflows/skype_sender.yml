@@ -4,12 +4,14 @@ on:
     branches:
       - master
     paths:
-      - 'skype_sender_1/**'
+      - 'skype_sender/**'
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+    - name: Change directory
+      run: cd skype_sender
     - name: Deploy code to Lambda
       uses: mariamrf/py-lambda-action@v1.0.0
       with:
