@@ -1,6 +1,7 @@
 """
 This script will let a user send messages on some Qxf2 Skype channels
 The channels must be listed in the environment variable SKYPE_CHANNELS
+TODO: Make Skype sender as an API endpoint and call it from here
 """
 import json
 import os
