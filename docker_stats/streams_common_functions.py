@@ -7,9 +7,9 @@ import os
 import sys
 import boto3
 import requests
-from github import Github
+import conf as cf
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import conf as conf
+
 
 
 def get_current_docker_data(docker_url):
@@ -25,8 +25,8 @@ def write_into_db(info, table_name):
     if not dynamodb:
         dynamodb = boto3.resource('dynamodb')
         table = dynamodb.Table(table_name)
-    if table_name in (conf.DOCKER_STATS_TABLE_NAME):
-        if True:
+    if table_name in cf.DOCKER_STATS_TABLE_NAME:
+        try:
             with table.batch_writer() as batch:
                 for container_stats in info:
                     date = container_stats['date']
@@ -34,5 +34,5 @@ def write_into_db(info, table_name):
                     print("Adding record for {} on {} to DynamoDB table {}."\
                             .format(container_name, date, table_name))
                     batch.put_item(Item=container_stats)
-        #except Exception:
-            #raise Exception('Exception while inserting data into table.')
+        except Exception:
+            raise Exception('Exception while inserting data into table.')
