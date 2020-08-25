@@ -30,7 +30,7 @@ def write_into_db(info, table_name):
             with table.batch_writer() as batch:
                 for container_stats in info:
                     date = container_stats['date']
-                    container_name = container_stats['container_name']
+                    container_name = container_stats['image_name']
                     print("Adding record for {} on {} to DynamoDB table {}."\
                             .format(container_name, date, table_name))
                     batch.put_item(Item=container_stats)

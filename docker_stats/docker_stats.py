@@ -16,7 +16,7 @@ def store_docker_stats(url):
     all_data = scf.get_current_docker_data(url)
     for data in all_data['results']:
         stats_obj.append({'date':current_date,\
-                    'container_name':data['name'], 'pulls':data['pull_count']})
+                    'image_name':data['name'], 'pulls':data['pull_count']})
     # Write docker stats into a DB.
     scf.write_into_db(stats_obj, cf.DOCKER_STATS_TABLE_NAME)
 
