@@ -43,3 +43,17 @@ def write_into_db(info, table_name):
                     batch.put_item(Item=repo_stats)
         except Exception:
             raise Exception('Exception while inserting data into table.')
+
+"""
+# code for pushing all the previous github data to dynamodb respective table
+import pandas
+def get_all_github_data():
+    stats_obj = []#list of dicts
+    data=pd.read_csv("github_stats.csv")
+    for i in range(len(data)):
+        dictionary = {'date':str(data.iloc[i][0]), 'repo_name':str(data.iloc[i][1]),\
+                      'stars':int(data.iloc[i][2]),'forks':int(data.iloc[i][3]),\
+                      'clones':int(data.iloc[i][4]), 'visitors':int(data.iloc[i][5])}
+        stats_obj.append(dictionary)
+    return stats_obj
+"""
