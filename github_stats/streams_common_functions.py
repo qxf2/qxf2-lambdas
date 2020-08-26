@@ -46,7 +46,7 @@ def write_into_db(info, table_name):
 
 """
 # code for pushing all the previous github data to dynamodb respective table
-import pandas
+import pandas as pd
 def get_all_github_data():
     stats_obj = []#list of dicts
     data=pd.read_csv("github_stats.csv")
