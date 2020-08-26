@@ -5,8 +5,7 @@ TODO: Make Skype sender as an API endpoint and call it from here
 """
 import json
 import os
-from skpy import Skype
-from skpy import SkypeMsg
+import requests
 
 def get_dict(my_string):
     "Return a dict from a string"
@@ -30,8 +29,11 @@ def post_message(event, context=None):
     if 'msg' in full_msg.keys():
         msg = full_msg['msg']
         channel_id = get_channel_id(full_msg)
-        skype_handler = Skype(os.environ.get('SKYPE_USERNAME'), os.environ.get('SKYPE_PASSWORD'))
-        channel = skype_handler.chats.chat(channel_id)
-        channel.sendMsg(msg, rich=True)
+        url = os.environ['SKYPE_SENDER_ENDPOINT']
+        data = {'API_KEY' : os.environ['API_TOKEN'],
+            'msg' : msg,
+            'channel' : channel_id}
+        response = requests.post(url, json=json.dumps(data))
+        print(f'Received {response.json()} for {msg}')
     else:
         print('The event had no key called msg in it\'s body')
