@@ -36,3 +36,17 @@ def write_into_db(info, table_name):
                     batch.put_item(Item=container_stats)
         except Exception:
             raise Exception('Exception while inserting data into table.')
+
+
+"""
+# function for pushing all the previous docker data from .csv file to dynamodb reapective table
+import pandas as pd
+def get_current_docker_data():
+    stats_obj = []#list of dicts
+    data=pd.read_csv("docker_stats.csv")
+    for i in range(len(data)):
+        dictionary = {'date':str(data.iloc[i][0]),\
+                    'image_name':str(data.iloc[i][1]), 'pulls':int(data.iloc[i][2])}
+        stats_obj.append(dictionary)
+    return stats_obj
+"""
