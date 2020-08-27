@@ -3,7 +3,6 @@ This script will let a user send messages on some Qxf2 Skype channels
 The channels must be listed in the environment variable SKYPE_CHANNELS
 TODO: Make Skype sender as an API endpoint and call it from here
 """
-import json
 import os
 import requests
 
@@ -33,7 +32,7 @@ def post_message(event, context=None):
         data = {'API_KEY' : os.environ['API_TOKEN'],
             'msg' : msg,
             'channel' : channel_id}
-        response = requests.post(url, json=json.dumps(data))
+        response = requests.post(url, json=data)
         print(f'Received {response.json()} for {msg}')
     else:
         print('The event had no key called msg in it\'s body')
