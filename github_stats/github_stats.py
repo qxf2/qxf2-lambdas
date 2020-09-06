@@ -26,12 +26,17 @@ def get_repo_stats(repo_name):
 def store_repo_stats(username):
     "Stores the Github stats for all repos that the user owns."
     all_repos = scf.get_all_repos(username)
-    stats_obj = [] #list of dicts
+    stats_obj = [] #list of all github data
+    substream_obj = [] #list of only substream data
     for repo in all_repos:
         repo_stats = get_repo_stats(repo)
+        substream_stats = {'date':repo_stats['date'], 'repo_name':repo_stats['repo_name']}
         stats_obj.append(repo_stats)
-    # Write the github stats into the DynamoDB table.
-    scf.write_into_db(stats_obj, cf.GITHUB_STATS_TABLE_NAME)
+        substream_obj.append(substream_stats)
+    # Write the github stats into the github_stats DynamoDB table.
+    scf.write_data_into_db(stats_obj, cf.GITHUB_STATS_TABLE_NAME)
+    # Write the github substream stats into the github_subtreams DynamoDB table.
+    scf.write_substream_into_db(substream_obj, cf.GITHUB_SUBSTREAM_TABLE_NAME)
 
 def handler(event, context):
     "handler is the main lambda function from where execution will start"
