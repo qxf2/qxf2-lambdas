@@ -1,7 +1,6 @@
 """
-Module to contain functions that are common across various streams:
-- stats fetching scripts.
-- score generation scripts.
+This Python module contains function that
+performs various dynamodb operations.
 """
 import os
 import sys
@@ -10,16 +9,14 @@ import requests
 import conf as cf
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-
-
 def get_current_docker_data(docker_url):
-    "Gets the current data from Docker Hub for all containers."
+    "Gets the current data from Docker Hub URL for all containers."
     response = requests.get(docker_url)
     result = response.json()
     return result
 
-def write_into_db(info, table_name):
-    "Writes info into DynamoDB table."
+def write_data_into_db(info, table_name):
+    "Writes info into docker_stats DynamoDB table."
     dynamodb = None
     # Initialise a DynomoDB table resource.
     if not dynamodb:
@@ -35,18 +32,23 @@ def write_into_db(info, table_name):
                             .format(container_name, date, table_name))
                     batch.put_item(Item=container_stats)
         except Exception:
-            raise Exception('Exception while inserting data into table.')
+            raise Exception('Exception while inserting data into docker_stats table.')
 
-
-"""
-# function for pushing all the previous docker data from .csv file to dynamodb reapective table
-import pandas as pd
-def get_current_docker_data():
-    stats_obj = []#list of dicts
-    data=pd.read_csv("docker_stats.csv")
-    for i in range(len(data)):
-        dictionary = {'date':str(data.iloc[i][0]),\
-                    'image_name':str(data.iloc[i][1]), 'pulls':int(data.iloc[i][2])}
-        stats_obj.append(dictionary)
-    return stats_obj
-"""
+def write_substream_into_db(info, table_name):
+    "Writes info into docker_substreams DynamoDB table."
+    dynamodb = None
+    # Initialise a DynomoDB table resource.
+    if not dynamodb:
+        dynamodb = boto3.resource('dynamodb')
+        table = dynamodb.Table(table_name)
+    if table_name in cf.DOCKER_SUBSTREAM_TABLE_NAME:
+        try:
+            with table.batch_writer() as batch:
+                for container_stats in info:
+                    date = container_stats['date']
+                    container_name = container_stats['image_name']
+                    print("Adding record for {} on {} to DynamoDB table {}."\
+                            .format(container_name, date, table_name))
+                    batch.put_item(Item=container_stats)
+        except Exception:
+            raise Exception('Exception while inserting data into docker_substreams table.')
