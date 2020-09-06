@@ -20,8 +20,9 @@ def get_repo_stats(repo_name):
     unique_visitors = visitor_stats.get('uniques', 0)
     clone_stats = repo.get_clones_traffic()
     unique_clones = clone_stats.get('uniques', 0)
-    return {'date':current_date, 'repo_name':repo_name, 'stars':stars,
+    data = {'date':current_date, 'repo_name':repo_name, 'stars':stars,
             'forks':forks, 'clones':unique_clones, 'visitors':unique_visitors}
+    return data
 
 def store_repo_stats(username):
     "Stores the Github stats for all repos that the user owns."
