@@ -9,8 +9,8 @@ import json
 import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import conf as cf
-import streams_common_functions as scf
+import conf
+import streams_common_functions as common_func
 
 def amend_yesterday_images_stats(yesterday, current_day_substreams,\
                              new_substreams, yesterday_images_stats):
@@ -33,14 +33,14 @@ def calculate_image_deltas():
     deltas = [] # list of dicts
     yesterday = (datetime.datetime.now()-datetime.timedelta(1)).strftime('%d-%b-%Y')
     today = datetime.datetime.now().strftime('%d-%b-%Y')
-    previous_day_substreams = scf.read_substreams(cf.DOCKER_SUBSTREAMS_TABLE, yesterday)
+    previous_day_substreams = common_func.read_substreams(conf.DOCKER_SUBSTREAMS_TABLE, yesterday)
     print(previous_day_substreams)
-    current_day_substreams = scf.read_substreams(cf.DOCKER_SUBSTREAMS_TABLE, today)
+    current_day_substreams = common_func.read_substreams(conf.DOCKER_SUBSTREAMS_TABLE, today)
     print(current_day_substreams)
-    yesterday_images_stats = scf.read_docker_table(cf.DOCKER_STATS_TABLE, yesterday,\
+    yesterday_images_stats = common_func.read_docker_table(conf.DOCKER_STATS_TABLE, yesterday,\
                                     previous_day_substreams)
     print(yesterday_images_stats)
-    today_images_stats = scf.read_docker_table(cf.DOCKER_STATS_TABLE, today,\
+    today_images_stats = common_func.read_docker_table(conf.DOCKER_STATS_TABLE, today,\
                                     current_day_substreams)
     print(today_images_stats)
     if len(current_day_substreams) > len(previous_day_substreams):
@@ -56,13 +56,12 @@ def calculate_image_deltas():
 
 def store_image_deltas(deltas):
     "Stores the deltas of docker image stats into DynamoDB."
-    scf.write_into_table(deltas, cf.DOCKER_DELTAS_TABLE)
+    common_func.write_into_table(deltas, conf.DOCKER_DELTAS_TABLE)
 
 def handler(event, context):
     "Lambda handler function for initiating the script"
     calculate_image_deltas()
     return {
-        "statusCode": 200,
         "body": json.dumps({
             "message": "Docker deltas running properly",
             # "location": ip.text.replace("\n", "")
