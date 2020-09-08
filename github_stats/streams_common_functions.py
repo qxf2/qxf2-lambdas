@@ -41,7 +41,6 @@ def write_data_into_db(info, table_name):
                     print("Adding record for {} on {} to DynamoDB table {}."\
                             .format(repo_name, date, table_name))
                     batch.put_item(Item=repo_stats)
-            return True
         except Exception:
             raise Exception('Exception while inserting data into github_stats table.')
 
