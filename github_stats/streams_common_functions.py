@@ -6,12 +6,12 @@ import os
 import sys
 import boto3
 from github import Github
-import conf as cf
+import conf
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def get_github_instance():
     "Returns a GitHub instance."
-    github_obj = Github(cf.TOKEN)
+    github_obj = Github(conf.TOKEN)
     return github_obj
 
 def get_all_repos(username):
@@ -32,7 +32,7 @@ def write_data_into_db(info, table_name):
     if not dynamodb:
         dynamodb = boto3.resource('dynamodb')
         table = dynamodb.Table(table_name)
-    if table_name in cf.GITHUB_STATS_TABLE_NAME:
+    if table_name in conf.GITHUB_STATS_TABLE_NAME:
         try:
             with table.batch_writer() as batch:
                 for repo_stats in info:
@@ -41,6 +41,7 @@ def write_data_into_db(info, table_name):
                     print("Adding record for {} on {} to DynamoDB table {}."\
                             .format(repo_name, date, table_name))
                     batch.put_item(Item=repo_stats)
+            return True
         except Exception:
             raise Exception('Exception while inserting data into github_stats table.')
 
@@ -51,7 +52,7 @@ def write_substream_into_db(info, table_name):
     if not dynamodb:
         dynamodb = boto3.resource('dynamodb')
         table = dynamodb.Table(table_name)
-    if table_name in cf.GITHUB_SUBSTREAM_TABLE_NAME:
+    if table_name in conf.GITHUB_SUBSTREAM_TABLE_NAME:
         try:
             with table.batch_writer() as batch:
                 for repo_stats in info:
