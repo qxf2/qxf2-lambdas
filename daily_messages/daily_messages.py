@@ -7,6 +7,7 @@ import requests
 BASE_URL = 'http://daily-messages.qxf2.com'
 QUEUE_URL = 'https://sqs.ap-south-1.amazonaws.com/285993504765/skype-sender'
 
+
 def clean_message(message):
     "Clean up the message received"
     message = message.replace("'", '-')
