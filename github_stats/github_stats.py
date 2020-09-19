@@ -4,46 +4,77 @@ Collect and store the GitHub stats for all Qxf2 repositories.
    date, repo_name, stars, forks, clones, visitors.
 This script is meant to be run everyday.
 """
-import json
+import boto3
 import datetime
+from github import Github
 import conf
-import streams_common_functions as common_func
 
-def get_repo_stats(repo_name):
-    "Gets stars, forks, unique clones, unique visitors for a repo."
-    current_date = datetime.datetime.now().strftime('%d-%b-%Y')
-    github_obj = common_func.get_github_instance()
-    repo = github_obj.get_repo(repo_name)
-    stars = repo.stargazers_count
-    forks = repo.forks
-    visitor_stats = repo.get_views_traffic()
-    unique_visitors = visitor_stats.get('uniques', 0)
-    clone_stats = repo.get_clones_traffic()
-    unique_clones = clone_stats.get('uniques', 0)
-    data = {'date':current_date, 'repo_name':repo_name, 'stars':stars,
-            'forks':forks, 'clones':unique_clones, 'visitors':unique_visitors}
-    return data
+def write_into_table(items, table_name):
+    "Writes items/records into DynamoDB table."
+    dynamodb = None
+    # Initialise a DynomoDB table resource.
+    if not dynamodb:
+        dynamodb = boto3.resource('dynamodb')
+        table = dynamodb.Table(table_name)
+    try:
+        with table.batch_writer() as batch:
+            for item in items:
+                batch.put_item(Item=item)
+        print(f"Added today's records successfully into DynamoDB table {table_name}.")
+        return 'data collected in {} table'.format(table_name)
+    except Exception:
+        return 'Exception while inserting data into {} table'.format(table_name)
 
-def store_repo_stats(username):
-    "Stores the Github stats for all repos that the user owns."
-    all_repos = common_func.get_all_repos(username)
-    stats_obj = [] #list of all github data
-    substream_obj = [] #list of only substream data
+def prepare_substreams(date, repos):
+    "Prepare substream data by taking all repo info"
+    substreams = [] # List of dicts
+    for repo in repos:
+        substreams.append({'date':date,\
+                        'repo_name':repo})
+    return substreams
+
+def prepare_stats(date, all_repos):
+    "Prepare stats data by taking all repo info"
+    stats = [] #list of dicts
+    github_obj = get_github_instance()
     for repo in all_repos:
-        repo_stats = get_repo_stats(repo)
-        substream_stats = {'date':repo_stats['date'], 'repo_name':repo_stats['repo_name']}
-        stats_obj.append(repo_stats)
-        substream_obj.append(substream_stats)
-    # Write the github stats into the github_stats DynamoDB table.
-    common_func.write_data_into_db(stats_obj, conf.GITHUB_STATS_TABLE_NAME)
-    # Write the github substream stats into the github_subtreams DynamoDB table.
-    common_func.write_substream_into_db(substream_obj, conf.GITHUB_SUBSTREAM_TABLE_NAME)
+        repo_obj = github_obj.get_repo(repo)
+        stars = repo_obj.stargazers_count
+        forks = repo_obj.forks
+        visitor_stats = repo_obj.get_views_traffic()
+        unique_visitors = visitor_stats.get('uniques', 0)
+        clone_stats = repo_obj.get_clones_traffic()
+        unique_clones = clone_stats.get('uniques', 0)
+        stats.append({'date':date, 'repo_name':repo, 'stars':stars,\
+            'forks':forks, 'clones':unique_clones, 'visitors':unique_visitors})
+    return stats
+
+def get_github_instance():
+    "Returns a GitHub instance."
+    github_obj = Github(conf.TOKEN)
+    return github_obj
+
+def get_all_repos():
+    "Gets all repos for the given username from GitHub."
+    github_obj = get_github_instance()
+    user = github_obj.get_user(conf.GITHUB_USER)
+    all_repos = []
+    repos = user.get_repos('all')
+    for repo in repos:
+        if conf.GITHUB_USER + '/' in repo.full_name:
+            all_repos.append(repo.full_name)
+    return all_repos
+
 
 def handler(event, context):
     "handler is the main lambda function from where execution will start"
-    store_repo_stats(conf.GITHUB_USER)
-    return {
-        "body": json.dumps({
-            "message": "github_stats running properly",
-        }),
-    }
+    all_repos = get_all_repos()
+    current_date = datetime.datetime.now().strftime('%d-%b-%Y')
+    substreams_data = prepare_substreams(current_date, all_repos)
+    stats_data = prepare_stats(current_date, all_repos)
+    message1 = write_into_table(substreams_data, conf.GITHUB_SUBSTREAMS_TABLE)
+    message2 = write_into_table(stats_data, conf.GITHUB_STATS_TABLE)
+    if message1 == 'data collected in github_substreams table' and message2 == 'data collected in github_stats table':
+        return "github stats collected successfully"
+    else:
+        return "Error while writing into dynamodb table"
