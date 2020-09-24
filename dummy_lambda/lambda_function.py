@@ -1,3 +1,6 @@
+"""
+Simplest lambda to play with GitHub actions
+"""
 import json
 
 def lambda_handler(event, context):
