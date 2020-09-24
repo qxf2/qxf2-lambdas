@@ -10,11 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: Change directory
-      run: cd dummy_lambda
     - name: Deploy code to Lambda
-      uses: mariamrf/py-lambda-action@v1.0.0
+      uses: qxf2/py-lambda-action
       with:
+        lambda_directory: 'dummy_lambda'
         lambda_function_name: arn:aws:lambda:ap-south-1:285993504765:function:dummyLambda
         requirements_txt: 'dummy_lambda/requirements.txt'
       env:
