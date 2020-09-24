@@ -1,0 +1,22 @@
+name: deploy-dummy-lambda
+on:
+  push:
+    branches:
+      - lambda-deploy-action
+    paths:
+      - 'dummy_lambda/**'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Deploy code to Lambda
+      run: cd dummy_lambda
+      uses: mariamrf/py-lambda-action@v1.0.0
+      with:
+        lambda_function_name: arn:aws:lambda:ap-south-1:285993504765:function:dummyLambda
+        requirements_txt: 'dummy_lambda/requirements.txt'
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ secrets.SKYPE_SENDER_REGION }}
