@@ -2,6 +2,7 @@
 Simplest lambda to play with GitHub actions
 Try 1: Failed. Simply change requirements.txt path
 Try 2: Changing the action to include a directory
+Try 3: Added a tag
 """
 import json
 
