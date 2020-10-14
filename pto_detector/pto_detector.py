@@ -30,7 +30,7 @@ def write_message(message, channel):
 
 def lambda_handler(event, context):
     "Lambda entry point"
-    record = event.get('Records')
+    record = event.get('Records')[0]
     message = record.get('body')
     message = json.loads(message)['Message']
     message = json.loads(message)
