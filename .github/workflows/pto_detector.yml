@@ -14,7 +14,8 @@ jobs:
       uses: qxf2/py-lambda-action@v1.0.2
       with:
         lambda_directory: 'pto_detector'
-        lambda_function_name: arn:aws:lambda:ap-south-1:285993504765:function:pto_detector
+        lambda_function_name: 'arn:aws:lambda:ap-south-1:285993504765:function:pto_detector'
+        lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:requests-boto:1'
         requirements_txt: 'pto_detector/requirements.txt'
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
