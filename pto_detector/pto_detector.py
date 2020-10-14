@@ -2,6 +2,7 @@
 Get messages for employees from pto-detector SQS
 And post to Skype Sender if the message is a PTO message
 """
+import json
 import boto3
 import requests
 IS_PTO_URL = 'http://practice-testing-ai-ml.qxf2.com/is-pto'
@@ -29,10 +30,11 @@ def write_message(daily_message, channel):
 
 def lambda_handler(event, context):
     "Lambda entry point"
-    print(event)
-    print(type(event))
-    message = event.get('msg')
-    channel = event.get('chat_id','test')
+    for record in event.get('Records'):
+        message = record.get('body')
+        print(message)
+        message = json.loads(message)
+        print(message)
     is_pto_flag = get_is_pto(clean_message(message))
     if is_pto_flag:
         write_message(message, channel)
