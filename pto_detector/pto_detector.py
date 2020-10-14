@@ -35,7 +35,7 @@ def lambda_handler(event, context):
     message = record.get('body')
     message = json.loads(message)['Message']
     message = json.loads(message)
-    if message['chat_id'] == : os.environ.get('PTO_CHANNEL')
+    if message['chat_id'] == os.environ.get('PTO_CHANNEL'):
         is_pto_flag = get_is_pto(clean_message(message['msg']))
         if is_pto_flag and message['user_id'] != os.environ.get('Qxf2Bot_USER'):
             message_to_send = f'Detected PTO message {message["msg"]}'
