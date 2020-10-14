@@ -32,7 +32,7 @@ def lambda_handler(event, context):
     "Lambda entry point"
     for record in event.get('Records'):
         message = record.get('body')
-        print(f'BODY OF MESSAGE {message}'')
+        print(f'BODY OF MESSAGE {message}')
         message = json.loads(message)['Message']
         message = json.loads(message)
     is_pto_flag = get_is_pto(clean_message(message['msg']))
