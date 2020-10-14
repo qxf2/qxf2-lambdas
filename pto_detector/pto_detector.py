@@ -30,6 +30,7 @@ def write_message(daily_message, channel):
 def lambda_handler(event, context):
     "Lambda entry point"
     print(event)
+    print(type(event))
     message = event.get('msg')
     channel = event.get('chat_id','test')
     is_pto_flag = get_is_pto(clean_message(message))
