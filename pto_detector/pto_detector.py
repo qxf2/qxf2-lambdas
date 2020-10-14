@@ -5,7 +5,7 @@ And post to Skype Sender if the message is a PTO message
 import json
 import boto3
 import requests
-IS_PTO_URL = 'http://practice-testing-ai-ml.qxf2.com/is-pto'
+IS_PTO_URL = 'https://practice-testing-ai-ml.qxf2.com/is-pto'
 QUEUE_URL = 'https://sqs.ap-south-1.amazonaws.com/285993504765/skype-sender'
 
 def clean_message(message):
@@ -18,24 +18,23 @@ def clean_message(message):
 def get_is_pto(message):
     "Check if the message is a PTO message"
     response = requests.post(url=IS_PTO_URL,data={'message':message})
-    result_flag = response.json()['answer'][-20:] == 'is not a PTO message'
+    result_flag = response.json()['answer'][-16:] == 'is a PTO message'
 
     return result_flag
 
-def write_message(daily_message, channel):
+def write_message(message, channel):
     "Send a message to Skype Sender"
     sqs = boto3.client('sqs')
-    message = str({'msg':f'{daily_message}', 'channel':channel})
+    message = str({'msg':f'{message}', 'channel':channel})
     sqs.send_message(QueueUrl=QUEUE_URL, MessageBody=(message))
 
 def lambda_handler(event, context):
     "Lambda entry point"
     for record in event.get('Records'):
         message = record.get('body')
-        print(f'BODY OF MESSAGE {message}')
         message = json.loads(message)['Message']
         message = json.loads(message)
-    is_pto_flag = get_is_pto(clean_message(message['msg']))
-    channel = message['chat_id']
-    if is_pto_flag:
-        write_message(message, channel)
+        is_pto_flag = get_is_pto(clean_message(message['msg']))
+        channel = message['chat_id']
+        if is_pto_flag:
+            write_message(message, channel)
