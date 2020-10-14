@@ -36,6 +36,6 @@ def lambda_handler(event, context):
     message = json.loads(message)
     if message['chat_id'] == '19:1941d15dada14943b5d742f2acdb99aa@thread.skype':
         is_pto_flag = get_is_pto(clean_message(message['msg']))
-        if is_pto_flag:
+        if is_pto_flag and message['user_id'] != "live:.cid.92bd244e945d8335":
             message_to_send = f'Detected PTO message {message["msg"]}'
             write_message(message_to_send, 'test')
