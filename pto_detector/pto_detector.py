@@ -32,9 +32,10 @@ def lambda_handler(event, context):
     "Lambda entry point"
     for record in event.get('Records'):
         message = record.get('body')
-        print(message)
+        print(f'BODY OF MESSAGE {message}'')
+        message = json.loads(message)['Message']
         message = json.loads(message)
-        print(message)
-    is_pto_flag = get_is_pto(clean_message(message))
+    is_pto_flag = get_is_pto(clean_message(message['msg']))
+    channel = message['chat_id']
     if is_pto_flag:
         write_message(message, channel)
