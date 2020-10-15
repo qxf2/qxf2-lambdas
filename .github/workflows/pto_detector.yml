@@ -2,7 +2,7 @@ name: deploy-pto-detector
 on:
   push:
     branches:
-      - pto-detector
+      - master
     paths:
       - 'pto_detector/**'
 jobs:
