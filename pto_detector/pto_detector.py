@@ -29,14 +29,26 @@ def write_message(message, channel):
     message = str({'msg':f'{message}', 'channel':channel})
     sqs.send_message(QueueUrl=QUEUE_URL, MessageBody=(message))
 
-def lambda_handler(event, context):
-    "Lambda entry point"
+def get_message_contents(event):
+    "Retrieve the message contents from the SQS event"
     record = event.get('Records')[0]
     message = record.get('body')
     message = json.loads(message)['Message']
     message = json.loads(message)
-    if message['chat_id'] == os.environ.get('PTO_CHANNEL'):
-        is_pto_flag = get_is_pto(clean_message(message['msg']))
-        if is_pto_flag and message['user_id'] != os.environ.get('Qxf2Bot_USER'):
-            message_to_send = f'Detected PTO message {message["msg"]}'
-            write_message(message_to_send, os.environ.get('SEND_CHANNEL'))
+
+    return message
+
+def lambda_handler(event, context):
+    "Lambda entry point"
+    message_contents = get_message_contents(event)
+    message = message_contents['msg']
+    channel = message_contents['chat_id']
+    user = message_contents['user_id']
+    print(f'{message}, {user}, {channel}')
+    is_pto_flag = False
+    if channel == os.environ.get('PTO_CHANNEL'):
+        is_pto_flag = get_is_pto(clean_message(message))
+        print(f'{is_pto_flag}')
+    if is_pto_flag and user != os.environ.get('Qxf2Bot_USER'):
+        message_to_send = f'Detected PTO message {message}'
+        write_message(message_to_send, os.environ.get('SEND_CHANNEL'))
