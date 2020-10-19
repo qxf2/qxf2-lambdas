@@ -19,7 +19,7 @@ def clean_message(message):
 def get_is_pto(message):
     "Check if the message is a PTO message"
     response = requests.post(url=IS_PTO_URL,data={'message':message})
-    result_flag = response.json()['answer'][-16:] == 'is a PTO message'
+    result_flag = response.json()['score'] == 1
 
     return result_flag
 
@@ -46,7 +46,7 @@ def lambda_handler(event, context):
     user = message_contents['user_id']
     print(f'{message}, {user}, {channel}')
     is_pto_flag = False
-    if channel == os.environ.get('PTO_CHANNEL'):
+    if channel == os.environ.get('PTO_CHANNEL') and user != os.environ.get('Qxf2Bot_USER'):
         is_pto_flag = get_is_pto(clean_message(message))
         print(f'{is_pto_flag}')
     if is_pto_flag and user != os.environ.get('Qxf2Bot_USER'):
