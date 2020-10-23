@@ -47,8 +47,9 @@ def lambda_handler(event, context):
     print(f'{message}, {user}, {channel}')
     is_pto_flag = False
     if channel == os.environ.get('PTO_CHANNEL') and user != os.environ.get('Qxf2Bot_USER'):
-        is_pto_flag = get_is_pto(clean_message(message))
+        cleaned_message = clean_message(message)
+        is_pto_flag = get_is_pto(cleaned_message)
         print(f'{is_pto_flag}')
     if is_pto_flag and user != os.environ.get('Qxf2Bot_USER'):
-        message_to_send = f'Detected PTO message {message}'
+        message_to_send = f'Detected PTO message {cleaned_message}'
         write_message(message_to_send, os.environ.get('SEND_CHANNEL'))
