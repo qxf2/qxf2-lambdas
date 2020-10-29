@@ -10,13 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: Change directory
-      run: cd skype_sender
     - name: Deploy code to Lambda
-      uses: mariamrf/py-lambda-action@v1.0.0
+      uses: qxf2/py-lambda-action@v1.0.2
       with:
+        lambda_directory: 'skype_sender'
         lambda_function_name: ${{ secrets.SKYPE_SENDER_FUNCTION }}
-        requirements_txt: 'requirements.txt'
+        lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:skpy'
+        requirements_txt: 'skype_sender/requirements.txt'
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

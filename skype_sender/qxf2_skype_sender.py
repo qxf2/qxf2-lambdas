@@ -1,7 +1,7 @@
 """
 This script will let a user send messages on some Qxf2 Skype channels
-The channels must be listed in the environment variable SKYPE_CHANNELS
-TODO: Make Skype sender as an API endpoint and call it from here
+Some of the commonly used channels are listed in the environment variable SKYPE_CHANNELS
+
 """
 import json
 import os
@@ -18,7 +18,7 @@ def get_channel_id(msg_body):
     "Return the channel id, default to main if channel not available"
     channel = msg_body.get('channel','main').lower()
     channels = get_dict(os.environ.get('SKYPE_CHANNELS'))
-    channel_id = channels.get(channel,channels['main'])
+    channel_id = channels.get(channel,channel)
 
     return channel_id
 
