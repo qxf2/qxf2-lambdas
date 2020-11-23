@@ -1,4 +1,4 @@
-name: Run tests from skype-sender repository
+name: Run Python Tests on skype_sender repository
 on:
   push:
     branches:
@@ -6,27 +6,24 @@ on:
   pull_request:
     branches:
       - master
-    paths:
-      - 'skype_sender/**'
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Run tests from skype-sender repository
-      uses: actions/setup-python@v1
-      with:
-        lambda_directory: 'skype_sender'
-        lambda_function_name: ${{ secrets.SKYPE_SENDER_FUNCTION }}
-        lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:skpy'
-        requirements_txt: 'tests/requirements.txt'
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_DEFAULT_REGION: ${{ secrets.SKYPE_SENDER_REGION }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    - name: Run tests with pytest
-      run: python -m pytest tests
+      - uses: actions/checkout@v2
+      - name: Install Python 3
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.6
+          lambda_directory: 'skype_sender'
+          lambda_function_name: ${{ secrets.SKYPE_SENDER_FUNCTION }}
+          lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:skpy'
+          requirements_txt: 'tests/requirements.txt'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run tests with pytest
+        run: python -m pytest tests
+
