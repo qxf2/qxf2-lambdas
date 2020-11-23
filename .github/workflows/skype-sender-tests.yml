@@ -16,6 +16,7 @@ jobs:
     - name: Run tests from skype-sender repository
       uses: actions/setup-python@v1
       with:
+        python-version: 3.6
         lambda_directory: 'skype_sender'
         lambda_function_name: ${{ secrets.SKYPE_SENDER_FUNCTION }}
         lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:skpy'
