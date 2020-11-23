@@ -28,4 +28,4 @@ jobs:
           pip install coverage
           pip install moto
       - name: Run tests with pytest
-        run: python -m pytest tests/test_integration_skype_sender.py
+        run: python -m pytest tests/test_integration_skype_lambda.py
