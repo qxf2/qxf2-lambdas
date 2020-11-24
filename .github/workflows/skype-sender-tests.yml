@@ -6,6 +6,8 @@ on:
   pull_request:
     branches:
       - master
+    paths:
+      - 'skype_sender/**'
 
 jobs:
   build:
@@ -16,6 +18,7 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: 3.6
+          lambda_directory: 'skype_sender'
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
