@@ -24,8 +24,10 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.SKYPE_SENDER_REGION }}
+      # Execute Test for daily message lambda 
       - name: Run test for daily message lambda
         run: coverage run -m pytest tests/test_integration_daily_messages_lambda.py
+      # Execute Test for skype lambda
       - name: Run test for skype lambda
         run : coverage run -m pytest tests/test_integration_skype_lambda.py
              
