@@ -11,5 +11,5 @@ We are really not sure how to distribute code among repos when maintaining a mic
 3.Mention the sqs name in the `sqs_utilities_conf.py` file in the `QUEUE_URL_LIST`.
 ### How to run End to End tests
 Please run the test using command `python tests/test_e2e_employee_skype_message.py`
-### How to run Unit vtest?
+### How to run Unit tests
 You can run test using command `coverage run -m pytest tests/test_integration_daily_messages_lambda.py`
