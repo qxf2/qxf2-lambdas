@@ -22,4 +22,4 @@ jobs:
           aws-region: ${{ secrets.TEST_SKYPE_SENDER_REGION }}
       # Execute test for skype-sender-lambda 
       - name: Run test for daily message lambda
-        run: python tests/test_e2e_employee_skype_message.py
+        run: python tests/test_integration_skype_lambda.py
