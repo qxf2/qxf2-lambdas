@@ -1,8 +1,8 @@
 name: Run E2E Test for skype-sender lambda
 on:
   push:
-    barnches: test_e2e_employee_skype_message
-  pull_requests:
+    branches: test_e2e_employee_skype_message
+  pull_request:
     branches: master
 jobs:
   build:
