@@ -10,7 +10,9 @@ We are really not sure how to distribute code among repos when maintaining a mic
 2.Create sqs queue which is subscribed to `qxf2-skype-listner` SNS topic.
 3.Mention the sqs name in the `sqs_utilities_conf.py` file in the `QUEUE_URL_LIST`.
 4.Minimum Python version requirement is 3.7+
+
 ### How to run End to End tests
 Please run the test using command `python tests/test_e2e_employee_skype_message.py`
-### How to run Unit vtest?
-You can run test using command `coverage run -m pytest tests/test_integration_daily_messages_lambda.py`
+
+### How to run test?
+You can run test using command `coverage run -m pytest tests/test_integration_daily_messages_lambda.py`. Before running test please ensure that you have setup with `aws_access_key_id`, `aws_secret_access_key` and `region` in the `credentials` file located under `.aws` folder. In case this folder is not available then please create a folder in the root directory and add `credentials` file there.
