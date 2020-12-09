@@ -9,7 +9,8 @@ We are really not sure how to distribute code among repos when maintaining a mic
 1.Please make sure that you have setup aws credentials of the test account such as `Region`, `Access Key` and `Secret access key` in the `~/.aws/credentials` folder
 2.Create sqs queue which is subscribed to `qxf2-skype-listner` SNS topic.
 3.Mention the sqs name in the `sqs_utilities_conf.py` file in the `QUEUE_URL_LIST`.
+4.Minimum Python version requirement is 3.7+
+
 ### How to run End to End tests
 Please run the test using command `python tests/test_e2e_employee_skype_message.py`
-### How to run Unit tests
-You can run test using command `coverage run -m pytest tests/test_integration_daily_messages_lambda.py`
+

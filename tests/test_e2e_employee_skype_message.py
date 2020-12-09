@@ -1,9 +1,9 @@
 """
 This End to end test employee skype message covers following:
 Setup- Purging SQS queue
-Step 1: Triggeering employee message lambda
-Step 2: Printing message from cloudwatch logs
-Step 3: verifying message with skype-listner sqs queue and culture file
+Step 1: Trigger employee message lambda
+Step 2: Print message from cloudwatch logs
+Step 3: Verify message with skype-listner sqs queue and culture file
 """
 
 import os
@@ -70,18 +70,18 @@ class Skypemessagetest():
 
 if __name__ == '__main__':
     Skypemessagetest_obj = Skypemessagetest()
-    logger.info("Setup- Purging SQS queue")
+    logger.info("Setup- Purge SQS queue")
     logger.info("---------------------------------------------------------------------------")
     Skypemessagetest_obj.clear_queues()
-    logger.info("Step 1: Triggeering employee message lambda--------------------------------")
+    logger.info("Step 1: Trigger employee message lambda--------------------------------")
     request_id = Skypemessagetest_obj.get_request_id()
     logger.info("---------------------------------------------------------------------------")
-    logger.info("Step 2: Printing message from cloudwatch logs------------------------------")
+    logger.info("Step 2: Print message from cloudwatch logs------------------------------")
     time.sleep(240)
     message = Skypemessagetest_obj.get_message_from_cloudwatch_log_ptr()
     logger.info("---------------------------------------------------------------------------")
     logger.info(message)
     logger.info("-------------------------------------------------------------------------- ")
-    logger.info("Step 3: verifying message with skype-listner sqs queue and culture file----")
+    logger.info("Step 3: Verify message with skype-listner sqs queue and culture file----")
     asyncio.run(helpers.asyncio_helper.poll_message(message))
     logger.info("-------------------------------------------------------------------------- ")
