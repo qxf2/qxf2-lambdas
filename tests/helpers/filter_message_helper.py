@@ -4,7 +4,33 @@ Helper module for filter message functionality
 import os
 import sys
 import json
+import conf.channel_configuration_conf as channel_conf
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+#Defining current file path
+CURR_FILE_PATH = os.path.dirname(os.path.abspath(__file__))
+MESSAGES_PATH = os.path.join(CURR_FILE_PATH, '')
+CULTURE_FILE = os.path.join(MESSAGES_PATH, 'culture.txt')
+
+#setting environment variable
+os.environ['chat_id']= channel_conf.chat_id
+os.environ['user_id'] = channel_conf.user_id
+
+# Declaring class Style
+class Style():
+    """
+    Declaring Style class
+    """
+    BLACK = '\033[30m'
+    RED = '\033[31m'
+    GREEN = '\033[32m'
+    YELLOW = '\033[33m'
+    BLUE = '\033[34m'
+    MAGENTA = '\033[35m'
+    CYAN = '\033[36m'
+    WHITE = '\033[37m'
+    UNDERLINE = '\033[4m'
+    RESET = '\033[0m'
 
 def get_dict(body_string):
     """
@@ -85,4 +111,78 @@ def compare_message_with_file(message, file_name):
         else:
             result_flag = False
 
+    return result_flag
+
+def validate_message_with_culture_file(message_on_channel):
+    """
+    Asserting message on channel with culture file
+    """
+    result_flag = compare_message_with_file(message_on_channel,CULTURE_FILE)
+    if result_flag is True:
+        print(Style.CYAN + '---------------------------\
+            ------------------------------------------------')
+        print(Style.CYAN + 'Step 3b. Validating \
+            message with culture file------------------------------')
+        print(Style.GREEN + 'Message \
+            on channel does match with culture file')
+        print(Style.CYAN + '-----------\
+            ----------------------------------------------------------------')
+    else:
+        print(Style.CYAN + '------------\
+            ---------------------------------------------------------------')
+        print(Style.GREEN + 'Message \
+            on channel does match with culture file')
+        print(Style.CYAN + '---------\
+            ------------------------------------------------------------------')
+    sys.exit()
+
+    return result_flag
+
+def validate_message_with_cloudwatch_logs(message_on_channel,message_cloudwatch):
+    """
+    Asserting method on channels with cloudwatch logs
+    """
+    if message_on_channel is not None:
+        result_flag = compare_message_cloudwatch_log(message_on_channel,message_cloudwatch)
+        if result_flag is True:
+            print(Style.CYAN + '---------------\
+                ------------------------------------------------------------')
+            print(Style.CYAN + 'Step 3a. Validating \
+                message with Skype listner SQS Queue-------------------')
+            print(Style.GREEN + 'Message on channel \
+                does match with the message from cloudwatch logs')
+            print(Style.CYAN + '----------------------\
+                -----------------------------------------------------')
+            result_flag = validate_message_with_culture_file(message_on_channel)
+        else:
+            print(Style.CYAN + '-------------\
+                --------------------------------------------------------------')
+            print(Style.RED + 'Message on channel does not match with \
+                the message from cloudwatch logs')
+            print(Style.CYAN + '---------------------\
+                ------------------------------------------------------')
+    else:
+            print(Style.CYAN + '---------------------------\
+                ------------------------------------------------')
+            print("No message on channel")
+            print(Style.CYAN + '------------------------------\
+                ---------------------------------------------')
+
+    return result_flag
+
+def publish_compare_result(message,message_cloudwatch):
+    """
+    Publish compare result
+    """
+    result_flag = filter_message\
+        (message,channel_conf.chat_id,channel_conf.user_id)
+    if result_flag is True:
+        message_on_channel= get_message(message)
+        result_flag = validate_message_with_cloudwatch_logs(message_on_channel,message_cloudwatch)
+    else:
+        print(Style.CYAN + '---------------------------------\
+            ------------------------------------------')
+        print(Style.CYAN + 'No message polled from the queue at this time')
+        print(Style.CYAN + '----------------------------\
+            -----------------------------------------------')
     return result_flag
