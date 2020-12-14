@@ -1,6 +1,9 @@
 name: Run E2E Test for skype-sender lambda
 on:
   push:
+    branches: master
+  pull_request:
+    branches: master
 jobs:
   build:
     runs-on: ubuntu-latest
