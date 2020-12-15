@@ -14,9 +14,5 @@ We are really not sure how to distribute code among repos when maintaining a mic
 ### How to run End to End tests
 Please run the test using command `python tests/test_e2e_employee_skype_message.py`
 
-<<<<<<< HEAD
-=======
 ### How to run Unit test?
 You can run test using command `coverage run -m pytest tests/test_integration_daily_messages_lambda.py`. Before running test please ensure that you have setup with `aws_access_key_id`, `aws_secret_access_key` and `region` in the `credentials` file located under `.aws` folder. In case this folder is not available then please create a folder in the root directory and add `credentials` file there.
-
->>>>>>> 0ca1ffe5822e709b9f5daeb5ba31f2ae4985ecb5
