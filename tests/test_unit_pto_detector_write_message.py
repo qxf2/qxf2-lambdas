@@ -1,4 +1,3 @@
-import os,sys
 import boto3
 import conf.channel_conf as conf
 import warnings
@@ -7,7 +6,6 @@ from unittest import mock
 from moto import mock_sqs
 from parameterized import parameterized, parameterized_class
 from pto_detector import pto_detector
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Added following code to fix deprecation warning
 with warnings.catch_warnings():
@@ -44,7 +42,6 @@ class TestWriteMessage(unittest.TestCase):
         pto_detector.write_message(self.message_to_send,conf.channel)
         sqs_message = queue.receive_messages()
         self.assertEqual(sqs_message[0].body,self.expected_message)
-        #assert len(sqs_message) == 1
         self.assertEqual(len(sqs_message),1)
 
 if __name__ == "__main__":
