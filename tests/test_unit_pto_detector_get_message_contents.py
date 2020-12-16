@@ -21,7 +21,9 @@ def get_class_name(cls, num, params_dict):
     )
 
 @parameterized_class([
-   { "event":str({"Records": [{"body": "{\"Message\":\"{\\\"msg\\\": \\\"Test: I am on PTO today\\\", \\\"chat_id\\\": \\\"19:f33e901e871d4c3c9ebbbbee66e59ebe@thread.skype\\\", \\\"user_id\\\":\\\"blah\\\"}\"}"}]}), "expected_message_contents": str({'msg': 'Test: I am on PTO today', 'chat_id': '19:f33e901e871d4c3c9ebbbbee66e59ebe@thread.skype','user_id': 'blah'})}], class_name_func=get_class_name)
+   { "event":str({"Records": [{"body": "{\"Message\":\"{\\\"msg\\\": \\\"Test: I am on PTO today\\\", \\\"chat_id\\\": \\\"19:f33e901e871d4c3c9ebbbbee66e59ebe@thread.skype\\\", \\\"user_id\\\":\\\"blah\\\"}\"}"}]}), "expected_message_contents": str({'msg': 'Test: I am on PTO today', 'chat_id': '19:f33e901e871d4c3c9ebbbbee66e59ebe@thread.skype','user_id': 'blah'})},
+   { "event":str({"Records": [{"body": "{\"Message\":\"{\\\"msg\\\": \\\"Test: I am on PTO tomorrow\\\", \\\"chat_id\\\": \\\"19:f33e901e871d4c3c9ebbbbee66e59ebe@thread.skype\\\", \\\"user_id\\\":\\\"blah\\\"}\"}"}]}), "expected_message_contents": str({'msg': 'Test: I am on PTO tomorrow', 'chat_id': '19:f33e901e871d4c3c9ebbbbee66e59ebe@thread.skype','user_id': 'blah'})}
+   ], class_name_func=get_class_name)
 
 class TestWriteMessage(unittest.TestCase):
     """
