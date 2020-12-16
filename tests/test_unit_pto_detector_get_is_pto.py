@@ -1,38 +1,32 @@
 import responses
 import requests
+import unittest
+from parameterized import parameterized, parameterized_class
 
-@responses.activate
-def test_unit_get_is_pto_score_1():
-    """
-    Unit test for pto_score == 1
-    """
-    responses.add(
-        responses.POST,
-        url='https://practice-testing-ai-ml.qxf2.com/is-pto',
-        body='{"message":"I am on PTO today","score":1}',
-        match=[
-            responses.urlencoded_params_matcher({'message':'I am on PTO today'})
-        ]
-    )
-    resp = requests.post("https://practice-testing-ai-ml.qxf2.com/is-pto", data={'message':'I am on PTO today'})
-    assert resp.status_code == 200
-    assert resp.text == '{"message":"I am on PTO today","score":1}'
-    assert resp.json()['score'] == 1
+@parameterized_class(("message", "score", "expected_status_code"), [
+   ("I am on PTO today", 1, 200),
+])
 
-@responses.activate
-def test_unit_get_is_pto_score_0():
+class Testgetispto(unittest.TestCase):
     """
-    Unit test for pto_score == 0
+    Test class for get is pto method
     """
-    responses.add(
-        responses.POST,
-        url='https://practice-testing-ai-ml.qxf2.com/is-pto',
-        body='{"message":"I am happy today","score":0}',
-        match=[
-            responses.urlencoded_params_matcher({'message':'I am happy today'})
-        ]
-    )
-    resp = requests.post("https://practice-testing-ai-ml.qxf2.com/is-pto", data={'message':'I am happy today'})
-    assert resp.status_code == 200
-    assert resp.text == '{"message":"I am happy today","score":0}'
-    assert resp.json()['score'] == 0
+    @responses.activate
+    def test_unit_get_is_pto_score(self):
+        """
+        Unit test for pto_score
+        """
+        responses.add(
+            responses.POST,
+            url='https://practice-testing-ai-ml.qxf2.com/is-pto',
+            body='{"message":"I am on PTO today","score":1}',
+            match=[
+                responses.urlencoded_params_matcher({"message":self.message})
+            ]
+        )
+        resp = requests.post("https://practice-testing-ai-ml.qxf2.com/is-pto", data={"message":self.message})
+        self.assertEqual(resp.status_code,self.expected_status_code)
+        self.assertEqual(resp.json()['score'],self.score)
+
+if __name__ == "__main__":
+    unittest.main()
