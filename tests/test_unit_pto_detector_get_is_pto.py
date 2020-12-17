@@ -1,5 +1,4 @@
 import requests
-import unittest
 from parameterized import parameterized_class
 
 @parameterized_class(("url", "message", "score", "expected_status_code"), [
@@ -7,7 +6,7 @@ from parameterized import parameterized_class
    ("https://practice-testing-ai-ml.qxf2.com/is-pto","I am happy today", 0, 200),
 ])
 
-class Testgetispto(unittest.TestCase):
+class Testgetispto(object):
     """
     Test class for get is pto method
     """
@@ -17,8 +16,5 @@ class Testgetispto(unittest.TestCase):
         Unit test for pto_score
         """
         resp = requests.post(self.url, data={"message":self.message})
-        self.assertEqual(resp.status_code,self.expected_status_code)
-        self.assertEqual(resp.json()['score'],self.score)
-
-if __name__ == "__main__":
-    unittest.main()
+        assert resp.status_code == self.expected_status_code
+        assert resp.json()['score'] == self.score
