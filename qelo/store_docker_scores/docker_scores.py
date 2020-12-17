@@ -1,5 +1,5 @@
 """
-Script to store the Docker substreams scores into DynomoDB every night.
+Lambda function to store the Docker substreams scores into DynamoDB every night.
 """
 import datetime
 from decimal import Decimal
