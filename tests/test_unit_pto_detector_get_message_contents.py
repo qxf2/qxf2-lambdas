@@ -29,7 +29,7 @@ class TestWriteMessage(unittest.TestCase):
     """
     Test class for get message contents
     """
-    def get_data_structure(self, data):
+    def get_event_data_structure(self, event_string):
         """
         Method used for converting nested dictionary/list to data similar to tabular form
         """
@@ -50,17 +50,25 @@ class TestWriteMessage(unittest.TestCase):
                 # use the parent_key and store the value to obj
                 obj[parent_key] = dataobject
 
-        recurse(data)
+        recurse(event_string)
 
         return obj
+
+    def extract_event_from_event_string(self):
+        """
+        Methid to get event dict
+        """
+        event_structure = self.get_event_data_structure(self.event)
+        event =ast.literal_eval(event_structure[''])
+
+        return event
 
     def test_pto_detector_get_message_contents(self):
         """
         Unit test for pto_detctor
         """
-        event_structure = self.get_data_structure(self.event)
-        event_dict =ast.literal_eval(event_structure[''])
-        actual_message = pto_detector.get_message_contents(event_dict)
+        event = self.extract_event_from_event_string()
+        actual_message = pto_detector.get_message_contents(event)
         self.assertEqual(str(actual_message), self.expected_message_contents)
 
 if __name__ == "__main__":
