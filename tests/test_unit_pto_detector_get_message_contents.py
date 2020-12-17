@@ -1,11 +1,7 @@
 import ast
 import collections
-import os
-import sys
 import boto3
 import json
-import warnings
-import unittest
 from parameterized import parameterized, parameterized_class
 from pto_detector import pto_detector
 
@@ -25,7 +21,7 @@ def get_class_name(cls, num, params_dict):
    { "event":str({"Records": [{"body": "{\"Message\":\"{\\\"msg\\\": \\\"Test: I am on PTO tomorrow\\\", \\\"chat_id\\\": \\\"19:f33e901e871d4c3c9ebbbbee66e59ebe@thread.skype\\\", \\\"user_id\\\":\\\"blah\\\"}\"}"}]}), "expected_message_contents": str({'msg': 'Test: I am on PTO tomorrow', 'chat_id': '19:f33e901e871d4c3c9ebbbbee66e59ebe@thread.skype','user_id': 'blah'})}
    ], class_name_func=get_class_name)
 
-class TestWriteMessage(unittest.TestCase):
+class TestWriteMessage(object):
     """
     Test class for get message contents
     """
@@ -69,7 +65,4 @@ class TestWriteMessage(unittest.TestCase):
         """
         event = self.extract_event_from_event_string()
         actual_message = pto_detector.get_message_contents(event)
-        self.assertEqual(str(actual_message), self.expected_message_contents)
-
-if __name__ == "__main__":
-    unittest.main()
+        assert str(actual_message) == self.expected_message_contents

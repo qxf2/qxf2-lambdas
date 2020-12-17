@@ -1,8 +1,6 @@
 import boto3
 import conf.channel_conf as conf
 import warnings
-import unittest
-from unittest import mock
 from moto import mock_sqs
 from parameterized import parameterized, parameterized_class
 from pto_detector import pto_detector
@@ -29,8 +27,10 @@ def get_class_name(cls, num, params_dict):
 ], class_name_func=get_class_name)
 
 @mock_sqs
-class TestWriteMessage(unittest.TestCase):
-    "Declaring class for write method"
+class TestWriteMessage(object):
+    """
+    Declaring class for write method"
+    """
 
     def test_pto_detector_write_message(self):
         """
@@ -41,8 +41,5 @@ class TestWriteMessage(unittest.TestCase):
         pto_detector.QUEUE_URL = queue.url
         pto_detector.write_message(self.message_to_send,conf.channel)
         sqs_message = queue.receive_messages()
-        self.assertEqual(sqs_message[0].body,self.expected_message)
-        self.assertEqual(len(sqs_message),1)
-
-if __name__ == "__main__":
-    unittest.main()
+        assert sqs_message[0].body == self.expected_message
+        assert len(sqs_message) == 1
