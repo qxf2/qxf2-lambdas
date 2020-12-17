@@ -1,4 +1,4 @@
-name: Run Python Tests on skype_sender repository
+name: Run unit tests on qxf2-lambdas repository
 on:
   push:
 jobs:
