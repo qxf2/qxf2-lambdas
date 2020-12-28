@@ -1,3 +1,6 @@
+"""
+Unit tests for write_message method pf pto_detector lambda
+"""
 import boto3
 import conf.channel_conf as conf
 import warnings

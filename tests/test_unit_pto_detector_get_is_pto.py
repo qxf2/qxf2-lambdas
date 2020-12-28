@@ -1,3 +1,6 @@
+"""
+Unit tests for get_is_pto method pf pto_detector lambda
+"""
 import requests
 from parameterized import parameterized_class
 

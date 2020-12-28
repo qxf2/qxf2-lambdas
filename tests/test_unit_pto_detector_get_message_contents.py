@@ -1,7 +1,8 @@
+"""
+Unit tests for get_message_contents method pf pto_detector lambda
+"""
 import ast
 import collections
-import boto3
-import json
 from parameterized import parameterized, parameterized_class
 from pto_detector import pto_detector
 
@@ -52,7 +53,7 @@ class TestWriteMessage(object):
 
     def extract_event_from_event_string(self):
         """
-        Methid to get event dict
+        Method to get event dict
         """
         event_structure = self.get_event_data_structure(self.event)
         event =ast.literal_eval(event_structure[''])
