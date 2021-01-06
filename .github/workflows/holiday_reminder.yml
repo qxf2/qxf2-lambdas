@@ -2,7 +2,7 @@ name: deploy-holiday-reminder
 on:
   push:
     branches:
-      - holiday-reminder
+      - master
     paths:
       - 'holiday_reminder/**'
 jobs:
