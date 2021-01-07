@@ -1,11 +1,12 @@
 name: Run E2E Test for skype-sender lambda
 on:
   push:
-    branches: master
-  pull_request:
-    branches: master
+    branches:
+      - master
+    paths:
+      -  'skype_sender/**'
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -23,6 +24,6 @@ jobs:
           aws-access-key-id: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.TEST_SKYPE_SENDER_REGION }}
-      # Execute test for skype-sender-lambda 
-      - name: Run test for daily message lambda
+      # Execute e2e Test
+      - name: Run e2e test
         run: python tests/test_e2e_employee_skype_message.py
