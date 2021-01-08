@@ -2,7 +2,7 @@ name: deploy-store-docker-scores
 on:
   push:
     branches:
-      - 'test_auto_deploy'
+      - master
     paths:
       - 'qelo/store_docker_scores/**'
 jobs:
