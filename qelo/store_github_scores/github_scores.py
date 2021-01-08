@@ -7,7 +7,7 @@ import github_conf as gc
 import dynamodb_functions as df
 
 def get_deltas_sum(substreams_deltas):
-    "Returns sum of all deltas for the substreams."
+    "Returns sum of all deltas for the GitHub substreams."
     delta_stars_sum = 0
     delta_forks_sum = 0
     delta_clones_sum = 0
