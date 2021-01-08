@@ -1,5 +1,5 @@
 """
-Lambda function to store the Docker substreams scores into DynomoDB at 9pm IST daily.
+Lambda function to store the Docker substreams scores into DynamoDB every night.
 """
 import datetime
 from decimal import Decimal
