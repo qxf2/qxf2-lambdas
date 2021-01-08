@@ -7,7 +7,7 @@ import docker_conf as dc
 import dynamodb_functions as df
 
 def get_deltas_sum(substreams_deltas):
-    "Returns sum of all deltas for the Docker substreams."
+    "Returns sum of all deltas for the Docker Hub substreams."
     delta_pulls_sum = 0
     for substream_deltas in substreams_deltas:
         delta_pulls_sum = delta_pulls_sum + int(substream_deltas['delta_pulls'])
