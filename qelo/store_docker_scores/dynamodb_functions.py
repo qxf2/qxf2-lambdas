@@ -6,6 +6,12 @@ import boto3
 from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
 
+def init_table(table_name):
+    "Initializes and returns the DynamoDB table resource."
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table(table_name)
+    return table
+
 def extract_substream_names(substreams_data, key):
     "Extracts the name of substreams from the complete substreams data."
     substreams = [substream_data[key] for substream_data in substreams_data]
@@ -13,11 +19,8 @@ def extract_substream_names(substreams_data, key):
 
 def read_substreams(table_name, date):
     "Retrieves substreams from the corresponding DynamoDB table."
-    dynamodb = None
-    # Initialise a DynamoDB table resource.
-    if not dynamodb:
-        dynamodb = boto3.resource('dynamodb')
-        table = dynamodb.Table(table_name)
+    # Initialize the DynamoDB table resource.
+    table = init_table(table_name)
     try:
         filtering_exp = Key('date').eq(date)
         response = table.query(KeyConditionExpression=filtering_exp)
@@ -41,12 +44,9 @@ def read_substreams(table_name, date):
 
 def read_docker_table(table_name, date, substreams):
     "Retrieves items that match the criteria, from corresponding Docker DynamoDB table."
-    dynamodb = None
     data = [] #list of dicts
-    # Initialise a DynamoDB table resource.
-    if not dynamodb:
-        dynamodb = boto3.resource('dynamodb')
-        table = dynamodb.Table(table_name)
+    # Initialize the DynamoDB table resource.
+    table = init_table(table_name)
     try:
         for substream in substreams:
             response = table.get_item(
@@ -70,11 +70,8 @@ def read_docker_table(table_name, date, substreams):
 
 def write_into_table(items, table_name):
     "Writes items/records into DynamoDB table."
-    dynamodb = None
-    # Initialise a DynamoDB table resource.
-    if not dynamodb:
-        dynamodb = boto3.resource('dynamodb')
-        table = dynamodb.Table(table_name)
+    # Initialize the DynamoDB table resource.
+    table = init_table(table_name)
     try:
         with table.batch_writer() as batch:
             for item in items:
