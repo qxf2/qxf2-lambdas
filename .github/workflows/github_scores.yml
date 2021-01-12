@@ -2,7 +2,7 @@ name: deploy-store-github-scores
 on:
   push:
     branches:
-      - 'test_github_scores_auto_deploy'
+      - master
     paths:
       - 'qelo/store_github_scores/**'
 jobs:
