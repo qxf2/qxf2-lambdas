@@ -1,39 +1,12 @@
 name: deploy-dummy-lambda
 on:
   push:
-    branches: master
+    branches:
+      - lambda-deploy-action
     paths:
       - 'dummy_lambda/**'
-  pull_request:
-    branches: master
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install Python 3
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.8
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r tests/requirements.txt
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.TEST_SKYPE_SENDER_REGION }}
-      # Execute test for daily message lambda
-      - name: Run test for daily message lambda
-        run: coverage run -m pytest tests/test_integration_daily_messages_lambda.py
-      # Execute Test for skype lambda
-      - name: Run test for skype lambda
-        run : coverage run -m pytest tests/test_integration_skype_lambda.py
   build:
-    needs: test
-    if: startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
