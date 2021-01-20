@@ -6,6 +6,8 @@ on:
     paths:
       - 'daily_messages/**'
       - 'skype_sender/**'
+      - 'tests/test_integration_daily_messages_lambda.py'
+      - 'tests/test_integration_skype_lambda.py'
 jobs:
   test:
     runs-on: ubuntu-latest
