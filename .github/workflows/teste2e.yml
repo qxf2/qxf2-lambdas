@@ -4,7 +4,9 @@ on:
     branches:
       - master
     paths:
-      -  'skype_sender/**'
+      - 'skype_sender/**'
+      - 'tests/test_e2e_employee_skype_message.py'
+      - '.github/workflows/teste2e.yml'
 jobs:
   test:
     runs-on: ubuntu-latest
