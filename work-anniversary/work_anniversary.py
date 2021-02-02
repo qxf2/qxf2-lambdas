@@ -47,7 +47,6 @@ def get_all_employees():
         }
     }"""
     access_token = authenticate()
-    print(f'Access token: {access_token}')
     headers = {'Authorization': f'Bearer {access_token}'}
     response = requests.get(url = BASE_URL, json = {'query': query}, headers =\
         headers)
@@ -100,6 +99,15 @@ def send_image(img, img_name, channel_id = credentials.CHANNEL_ID):
         ]
     response = requests.post(SKYPE_URL, files = files)
 
+def is_qxf2_anniversary(current_date):
+    "Check if its Qxf2's anniversary"
+    if (current_date.month == 2 and current_date.day == 1):
+        qxf2_start_date = datetime.datetime.strptime('01-Feb-13',"%d-%b-%y")
+        difference_in_years = inflect_obj.ordinal(relativedelta(current_date, qxf2_start_date).years)
+        msg = f'Qxf2 {difference_in_years} Year Anniversary'
+        quote_string = 'Wishing a Great Success Ahead'
+        add_text_to_image(msg, 'qxf2', quote_string)
+    
 def is_work_anniversary():
     "Get the work anniversary"
     emp_data = get_all_employees()
@@ -111,13 +119,14 @@ def is_work_anniversary():
             emp_joined_date = datetime.datetime.strptime(emp_joined_date,"%d-%b-%y")
             current_date = date.today()
             message,quote_string = calculate_work_anniversary(emp_joined_date, current_date, emp_name)
-            
             if message is not None:
                 add_text_to_image(message,emp_name,quote_string)
+    is_qxf2_anniversary(current_date)
 
 def lambda_handler(event, context):
     "lambda entry point"
     is_work_anniversary()
+
 
 
 
