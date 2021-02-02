@@ -18,7 +18,6 @@ SKYPE_URL = 'https://skype-sender.qxf2.com/send-image'
 BASE_URL = 'https://qxf2-employees.qxf2.com/graphql'
 inflect_obj = inflect.engine()
 
-emp_list = []
 def authenticate():
     "Return an authenticate code"
     query = f"""mutation {{
@@ -109,7 +108,6 @@ def is_work_anniversary():
         emp_joined_date = each_node['node']['dateJoined']
         if employee_active and emp_joined_date is not None:
             emp_name = each_node['node']['firstname'] + " "+each_node['node']['lastname']
-            emp_list.append(each_node)
             emp_joined_date = datetime.datetime.strptime(emp_joined_date,"%d-%b-%y")
             current_date = date.today()
             message,quote_string = calculate_work_anniversary(emp_joined_date, current_date, emp_name)
