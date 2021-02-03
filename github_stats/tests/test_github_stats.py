@@ -9,7 +9,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from unittest.mock import patch
 from input_data import *
 import pytest
-import conf
 import github_stats
 
 @pytest.mark.parametrize('data,result',

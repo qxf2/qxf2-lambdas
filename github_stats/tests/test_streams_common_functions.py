@@ -10,7 +10,6 @@ from moto import mock_dynamodb2
 from input_data import *
 import boto3
 import pytest
-import conf
 import streams_common_functions
 
 @pytest.mark.parametrize('data,output',[(stats['single'],message['success']),

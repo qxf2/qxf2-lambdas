@@ -11,7 +11,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def get_github_instance():
     "Returns a GitHub instance."
-    github_obj = Github(conf.TOKEN)
+    github_obj = Github(os.environ["ACCESS_KEY"])
     return github_obj
 
 def get_all_repos():
