@@ -2,7 +2,7 @@ name: deploy-webapps-deltas
 on:
   push:
     branches:
-      - 'store_webapps_deltas'
+      - master
     paths:
       - 'qelo/store_webapps_deltas/**'
 jobs:
