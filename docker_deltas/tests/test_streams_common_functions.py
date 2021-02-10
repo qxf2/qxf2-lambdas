@@ -4,14 +4,12 @@ are working good in terms of different input situation.
 """
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from unittest.mock import patch
+import pytest
 from moto import mock_dynamodb2
 import boto3
-import pytest
-import conf
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from input_data import output_substreams,handler_substreams,substreams,docker_stats,reading_message,data,message,key
 import streams_common_functions
-from input_data import *
 
 @pytest.mark.parametrize('substreams,key,expected_output',
                          [(output_substreams['single_data'],key,
@@ -98,7 +96,7 @@ def test_write_into_table(data,output):
     "testing writing of data into the given dynamodb table"
     dynamodb = boto3.resource('dynamodb', 'ap-south-1')
     table_name = 'test'
-    table = dynamodb.create_table(
+    dynamodb.create_table(
         TableName=table_name,
         KeySchema=[
             {'AttributeName': 'date',

@@ -4,13 +4,13 @@ github_deltas in terms of different input data
 """
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from unittest.mock import patch
 import pytest
-import conf
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from input_data import date,substreams_data,new_substreams,github_stats,amend_stats,handler_stats,handler_substreams,deltas,message,output
 import github_deltas
 import streams_common_functions
-from input_data import *
+
 
 @pytest.mark.parametrize('date,current_day_substreams,new_substreams,\
                          yesterday_images_stats,test_output',

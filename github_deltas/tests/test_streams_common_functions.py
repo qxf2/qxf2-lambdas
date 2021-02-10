@@ -1,11 +1,16 @@
-import os,sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from unittest.mock import patch
-from moto import mock_dynamodb2
-from input_data import *
-import boto3
+"""
+testing working behavior of all the functions of
+streams_common_functions in terms of different
+input data
+"""
+
+import os
+import sys
 import pytest
-import conf
+from moto import mock_dynamodb2
+from input_data import output_substreams,reading_substream,key,handler_substreams,github_stats,substreams,reading_message,table,data,message
+import boto3
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import streams_common_functions
 
 @pytest.mark.parametrize('substreams,key,expected_output',[(output_substreams['single_data'],key,handler_substreams['single_data'])])

@@ -2,15 +2,18 @@
 testing working behavior of all the functions in streams_common_functions
 in terms of different inputs
 """
+
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from unittest.mock import patch
+import pytest
+
 from moto import mock_dynamodb2
 import boto3
-import pytest
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import streams_common_functions
-from input_data import *
+from input_data import stats,response,url,message
 
 @patch('requests.get')
 def test_get_current_docker_data(mocked_request):
@@ -27,7 +30,7 @@ def test_write_into_table(data,output):
     "testing writing of data into the given dynamodb table"
     dynamodb = boto3.resource('dynamodb', 'ap-south-1')
     table_name = 'test'
-    table = dynamodb.create_table(
+    dynamodb.create_table(
         TableName=table_name,
         KeySchema=[
             {'AttributeName': 'date',
