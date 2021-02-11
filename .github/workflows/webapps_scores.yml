@@ -2,7 +2,7 @@ name: deploy-webapps-scores
 on:
   push:
     branches:
-      - 'store_webapps_scores'
+      - master
     paths:
       - 'qelo/store_webapps_scores/**'
 jobs:
