@@ -1,0 +1,47 @@
+name: deploy-daily-messages
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'daily_messages/**'
+      - 'tests/test_integration_daily_messages_lambda.py'
+      - '.github/workflows/daily_messages.yml'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Python 3
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r tests/requirements.txt
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.TEST_SKYPE_SENDER_REGION }}
+      # Execute Test for daily message lambda
+      - name: Run test for daily message lambda
+        run: coverage run -m pytest tests/test_integration_daily_messages_lambda.py
+  build:
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Deploy code to Lambda
+      uses: qxf2/py-lambda-action@v1.0.2
+      with:
+        lambda_directory: 'daily_messages'
+        lambda_function_name: 'arn:aws:lambda:ap-south-1:285993504765:function:qxf2-employee-messages'
+        lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:requests-boto'
+        requirements_txt: 'daily_messages/requirements.txt'
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ secrets.SKYPE_SENDER_REGION }}
