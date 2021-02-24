@@ -116,7 +116,6 @@ def write_message(daily_message, channel):
 
 def lambda_handler(event, context):
     "Lambda entry point"
-    #This lambda expects an event of type {'endpoint':'/blah','channel':'blah'}
     pto_list = main() 
     for msg in pto_list:
         message = '{}Is on PTO'.format(msg)
