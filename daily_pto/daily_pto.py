@@ -1,9 +1,13 @@
+"""
+Get PTO names from the google calender
+And post to Skype Sender
+"""
+
 from __future__ import print_function
 import httplib2
 import os
 import json
 import datetime
-# from datetime import timedelta
 import googleapiclient.discovery as discovery
 from oauth2client import client
 from oauth2client import tools
@@ -23,10 +27,8 @@ APPLICATION_NAME = 'Quickstart'
  
 def get_credentials():
     """Gets valid user credentials from storage.
- 
     If nothing has been stored, or if the stored credentials are invalid,
     the OAuth2 flow is completed to obtain the new credentials.
- 
     Returns:
         Credentials, the obtained credential.
     """
@@ -37,7 +39,6 @@ def get_credentials():
     credential_path = os.path.join(credential_dir,
                                    'calendar-python-quickstart.json')
     
- 
     store = Storage(credential_path)
     credentials = store.get() 
     if not credentials or credentials.invalid:
@@ -50,17 +51,14 @@ def get_credentials():
         print('Storing credentials to ' + credential_path)
     return credentials
  
-
 def main():
     """Shows basic usage of the Google Calendar API.
- 
     Creates a Google Calendar API service object and outputs a list of the next
     10 events on the user's calendar.
     """
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)
-
  # This code is to fetch the calendar ids shared with me
     # Src: https://developers.google.com/google-apps/calendar/v3/reference/calendarList/list
     page_token = None
@@ -74,7 +72,6 @@ def main():
         page_token = calendar_list.get('nextPageToken')
         if not page_token:
             break
- 
     # This code is to look for all-day events in each calendar for the month
     # Src: https://developers.google.com/google-apps/calendar/v3/reference/events/list
     # You need to get this from command line
@@ -104,9 +101,7 @@ def main():
                         pto_name = event['creator']['email'].split("@")[0]
                         pto_list.append(pto_name)
                         print(pto_list)
-
     return pto_list
-
 
 def write_message(daily_message, channel):
     "Send a message to Skype Sender"
