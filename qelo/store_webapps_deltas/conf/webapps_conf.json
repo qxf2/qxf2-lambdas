@@ -1,0 +1,12 @@
+{
+    "webapps":[
+    {"app_name": "Database trainer",
+     "view_id": "214412698"},
+    {"app_name": "QA Interview Application",
+    "view_id": "178172806"},
+    {"app_name": "QXf2 Trainer",
+    "view_id": "182188520"},
+    {"app_name": "the-bored-qa",
+    "view_id": "222974048"}
+    ]
+}
