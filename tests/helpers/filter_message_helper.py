@@ -4,7 +4,8 @@ Helper module for filter message functionality
 import os
 import sys
 import json
-import conf.channel_configuration_conf as channel_conf
+import pytest
+import tests.conf.channel_configuration_conf as channel_conf
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 #Defining current file path
@@ -49,6 +50,7 @@ def get_message_body(message):
     """
     This method will return message body
     """
+    msg_body = ""
     if 'Messages' in message:
         for message in message['Messages']:
             if 'Body' in message.keys():
@@ -64,7 +66,8 @@ def get_message_body(message):
 
     else:
         print("No messages are retrieved")
-        sys.exit()
+        with pytest.raises(SystemExit):
+            sys.exit()
 
     return msg_body
 
@@ -74,10 +77,18 @@ def filter_message(message,chat_id,user_id):
     return: Boolean value
     """
     message_body = get_message_body(message)
-    if message_body['chat_id']==chat_id and message_body['user_id']==user_id:
-        return True
+    if message_body is not None:
+        if "chat_id" in message_body and "user_id" in message_body:
+            if message_body['chat_id']==chat_id and message_body['user_id']==user_id:
+                print(f'message is from test channel and  sender is skype sender lambda')
+            else:
+                print(f'Neither message is from test channel nor sender is skype sender lambda')
+        else:
+            print(f'Message does not contain required keys')
     else:
-        print(f'Neither message is from test channel neither sender is skype sender lambda')
+        print(f'Message body is not none')
+
+    return True
 
 def compare_message_cloudwatch_log(message_on_channel, message_cloudwatch):
     """
@@ -97,7 +108,13 @@ def get_message(message):
     """
     message_body = get_message_body(message)
 
-    return message_body['msg']
+    if message_body is not None:
+        if "msg" in message_body:
+            return message_body['msg']
+        else:
+            print(f'Message body does not contain message key')
+    else:
+        print(f'Message body is none')
 
 def compare_message_with_file(message, file_name):
     """
@@ -117,24 +134,27 @@ def validate_message_with_culture_file(message_on_channel):
     """
     Asserting message on channel with culture file
     """
-    result_flag = compare_message_with_file(message_on_channel,CULTURE_FILE)
-    if result_flag is True:
-        print(Style.CYAN + '---------------------------\
-            ------------------------------------------------')
-        print(Style.CYAN + 'Step 3b. Validating \
-            message with culture file------------------------------')
-        print(Style.GREEN + 'Message \
-            on channel does match with culture file')
-        print(Style.CYAN + '-----------\
-            ----------------------------------------------------------------')
+    result_flag = False
+    if message_on_channel is not None:
+        result_flag = compare_message_with_file(message_on_channel,CULTURE_FILE)
+        if result_flag is True:
+            print(Style.CYAN + '---------------------------\
+                ------------------------------------------------')
+            print(Style.CYAN + 'Step 3b. Validating \
+                message with culture file------------------------------')
+            print(Style.GREEN + 'Message \
+                on channel does match with culture file')
+            print(Style.CYAN + '-----------\
+                ----------------------------------------------------------------')
+        else:
+            print(Style.CYAN + '------------\
+                ---------------------------------------------------------------')
+            print(Style.GREEN + 'Message \
+                on channel does match with culture file')
+            print(Style.CYAN + '---------\
+                ------------------------------------------------------------------')
     else:
-        print(Style.CYAN + '------------\
-            ---------------------------------------------------------------')
-        print(Style.GREEN + 'Message \
-            on channel does match with culture file')
-        print(Style.CYAN + '---------\
-            ------------------------------------------------------------------')
-    sys.exit()
+        print(Style.CYAN + 'There is no message on channel')
 
     return result_flag
 
@@ -142,6 +162,7 @@ def validate_message_with_cloudwatch_logs(message_on_channel,message_cloudwatch)
     """
     Asserting method on channels with cloudwatch logs
     """
+    result_flag = False
     if message_on_channel is not None:
         result_flag = compare_message_cloudwatch_log(message_on_channel,message_cloudwatch)
         if result_flag is True:
