@@ -98,7 +98,7 @@ def add_text_to_image(message,emp_name,quote_string):
     color = 'rgb(255, 69, 0)' # orange color
     draw.text((x, y), quote_string, fill=color, font=font2)
 
-    filepath = '/tmp/' +emp_name+ '_greeting_card.png' #uncomment this later
+    filepath = '/tmp/' +emp_name+ '_greeting_card.png'
     image.save(filepath,quality=95)
     return filepath
 
