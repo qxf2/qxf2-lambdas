@@ -2,7 +2,7 @@ name: work-anniversary-reminder
 on:
   push:
     branches:
-      - update-anniversary-quotes
+      - master
     paths:
       - 'work-anniversary/**'
 jobs:

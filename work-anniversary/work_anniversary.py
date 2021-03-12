@@ -20,12 +20,6 @@ SKYPE_URL = 'https://skype-sender.qxf2.com/send-image'
 BASE_URL = 'https://qxf2-employees.qxf2.com/graphql'
 inflect_obj = inflect.engine()
 
-
-#clear this after updating
-emp_data = [{'node': {'email': 'mak@qxf2.com', 'firstname': 'Sachin', 'lastname': 'T', 'dateJoined': '11-Mar-13', 'isActive': 'Y'}},{'node': {'email': 'mak@qxf2.com', 'firstname': 'Virender', 'lastname': 'S', 'dateJoined': '11-Mar-12', 'isActive': 'Y'}},
-{'node': {'email': 'mak@qxf2.com', 'firstname': 'Rahul', 'lastname': 'D', 'dateJoined': '11-Mar-11', 'isActive': 'Y'}},
-{'node': {'email': 'mak@qxf2.com', 'firstname': 'Sourav', 'lastname': 'G', 'dateJoined': '11-Mar-13', 'isActive': 'Y'}}]
-
 def authenticate():
     "Return an authenticate code"
     query = f"""mutation {{
@@ -86,7 +80,7 @@ def calculate_work_anniversary(emp_joined_date, current_date, emp_name):
                 quote_string = get_default_quotes(data,difference_in_years)
         else:
             quote_string = get_default_quotes(data,difference_in_years)    
-        final_quote_string = '\n'.join(textwrap.wrap(quote_string, 70, break_long_words=False,subsequent_indent='\n'))
+    final_quote_string = '\n'.join(textwrap.wrap(quote_string, 70, break_long_words=False,subsequent_indent='\n')) if quote_string is not None else ''
     return msg,final_quote_string
 
 def add_text_to_image(message,emp_name,quote_string):
@@ -104,9 +98,7 @@ def add_text_to_image(message,emp_name,quote_string):
     color = 'rgb(255, 69, 0)' # orange color
     draw.text((x, y), quote_string, fill=color, font=font2)
 
-    filepath = emp_name+ '_greeting_card.png'
-    
-    #filepath = '/tmp/' +emp_name+ '_greeting_card.png' #uncomment this later
+    filepath = '/tmp/' +emp_name+ '_greeting_card.png' #uncomment this later
     image.save(filepath,quality=95)
     return filepath
 
@@ -120,7 +112,7 @@ def send_image(img, img_name, channel_id = credentials.CHANNEL_ID):
         ]
     response = requests.post(SKYPE_URL, files = files)
     time.sleep(2)
-    return response.status_code #uncomment this later
+    return response.status_code
 
 def is_qxf2_anniversary(current_date):
     "Check if its Qxf2's anniversary"
@@ -134,9 +126,8 @@ def is_qxf2_anniversary(current_date):
     
 def is_work_anniversary():
     "Get the work anniversary"
-    #emp_data = get_all_employees()  #uncomment this later               
+    emp_data = get_all_employees()             
     for each_node in emp_data:
-        print(each_node['node']['firstname'])
         employee_active = is_active_employee(each_node)
         emp_joined_date = each_node['node']['dateJoined']
         if employee_active and emp_joined_date is not None:
@@ -147,14 +138,10 @@ def is_work_anniversary():
             if message is not None:
                 file_path = add_text_to_image(message,emp_name,quote_string)
                 status_code = send_image(file_path,'work_anniversary') 
-                os.remove(file_path)  #uncomment this later
+                os.remove(file_path)
     is_qxf2_anniversary(current_date)
 
 
 def lambda_handler(event, context):
     "lambda entry point"
     is_work_anniversary()
-
-if __name__ == "__main__":
-    is_work_anniversary()
-
