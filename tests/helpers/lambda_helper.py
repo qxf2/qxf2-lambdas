@@ -5,7 +5,7 @@ import os
 import sys
 import logging
 import boto3
-import conf.lambda_configuration_conf as lambda_conf
+import tests.conf.lambda_configuration_conf as lambda_conf
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def trigger_cron_lambda(lambda_name: str):

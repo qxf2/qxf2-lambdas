@@ -6,7 +6,7 @@ on:
     paths:
       - 'skype_sender/**'
       - 'tests/test_integration_skype_lambda.py'
-      - 'tests/test_e2e_employee_skype_message.py'
+      - 'tests/test_end_to_end_employee_skype_message.py'
       - '.github/workflows/skype_sender.yml'
 jobs:
   test:
@@ -30,9 +30,9 @@ jobs:
       # Execute Test for skype sender lambda
       - name: Run test for skype lambda
         run : python -m pytest tests/test_integration_skype_lambda.py -sv
-      # Execute e2e Test
-      - name: Run e2e test
-        run: python tests/test_e2e_employee_skype_message.py
+      # Execute end to end test
+      - name: Run end to end test
+        run: python -m pytest tests/test_end_to_end_employee_skype_message.py -sv
   build:
     needs: [test]
     runs-on: ubuntu-latest
