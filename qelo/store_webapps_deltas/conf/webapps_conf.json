@@ -7,6 +7,12 @@
     {"app_name": "QXf2 Trainer",
     "view_id": "182188520"},
     {"app_name": "the-bored-qa",
-    "view_id": "222974048"}
+    "view_id": "222974048"},
+    {"app_name": "Weather Shopper",
+    "view_id": "240047836"},
+    {"app_name": "Interview Scheduler",
+    "view_id": "240213568"},
+    {"app_name": "How am I doing?",
+    "view_id": "240208632"}
     ]
 }

@@ -1,13 +1,12 @@
-name: deploy-skype-sender
+name: deploy-daily-messages
 on:
   push:
     branches:
       - master
     paths:
-      - 'skype_sender/**'
-      - 'tests/test_integration_skype_lambda.py'
-      - 'tests/test_end_to_end_employee_skype_message.py'
-      - '.github/workflows/skype_sender.yml'
+      - 'daily_messages/**'
+      - 'tests/test_integration_daily_messages_lambda.py'
+      - '.github/workflows/daily_messages.yml'
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -27,12 +26,9 @@ jobs:
           aws-access-key-id: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.TEST_SKYPE_SENDER_REGION }}
-      # Execute Test for skype sender lambda
-      - name: Run test for skype lambda
-        run : python -m pytest tests/test_integration_skype_lambda.py -sv
-      # Execute end to end test
-      - name: Run end to end test
-        run: python -m pytest tests/test_end_to_end_employee_skype_message.py -sv
+      # Execute Test for daily message lambda
+      - name: Run test for daily message lambda
+        run: coverage run -m pytest tests/test_integration_daily_messages_lambda.py
   build:
     needs: [test]
     runs-on: ubuntu-latest
@@ -41,10 +37,10 @@ jobs:
     - name: Deploy code to Lambda
       uses: qxf2/py-lambda-action@v1.0.2
       with:
-        lambda_directory: 'skype_sender'
-        lambda_function_name: ${{ secrets.SKYPE_SENDER_FUNCTION }}
-        lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:skpy'
-        requirements_txt: 'skype_sender/requirements.txt'
+        lambda_directory: 'daily_messages'
+        lambda_function_name: 'arn:aws:lambda:ap-south-1:285993504765:function:qxf2-employee-messages'
+        lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:requests-boto'
+        requirements_txt: 'daily_messages/requirements.txt'
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
