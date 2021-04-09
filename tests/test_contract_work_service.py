@@ -1,3 +1,5 @@
+"Contract test for work anniversary"
+
 import os
 import json
 import atexit
