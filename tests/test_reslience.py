@@ -14,7 +14,7 @@ sqs = boto3.client('sqs')
 def send_messages_to_sqs():
     "Send messages continuously"
     for range (20):
-        queue_url = 'aws:lambda:ap-south-1:285993504765:function:pto_detector'
+        queue_url = 'value'
         response = sqs.send_message(
         QueueUrl=queue_url,
         DelaySeconds=10,
