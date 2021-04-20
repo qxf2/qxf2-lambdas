@@ -9,7 +9,7 @@ import collections
 from datetime import datetime, timedelta
 import time
 import boto3
-import conf.cloudwatch_configuration_conf as cloudwatch_conf
+import tests.conf.cloudwatch_configuration_conf as cloudwatch_conf
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def get_data_structure(data):
