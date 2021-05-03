@@ -12,6 +12,11 @@ import googleapiclient.discovery as discovery
 from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
+from google.oauth2 import service_account
+from apiclient.discovery import build
+from oauth2client.service_account import ServiceAccountCredentials
+from oauth2client.client import GoogleCredentials
+import googleapiclient.discovery
  
 try:
     import argparse
@@ -21,45 +26,47 @@ except ImportError:
  
 # If modifying these scopes, delete your previously saved credentials
 # at ~/.credentials/calendar-python-quickstart.json
-SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
+SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
+# CLIENT_SECRET_FILE = os.path.join(os.path.dirname(__file__),'client_secret_google_calendar.json')
 CLIENT_SECRET_FILE = 'client_secret_google_calendar.json'
-APPLICATION_NAME = 'Quickstart'
+SUBJECT = 'mohan@qxf2.com'
+
  
-def get_credentials():
-    """Gets valid user credentials from storage.
-    If nothing has been stored, or if the stored credentials are invalid,
-    the OAuth2 flow is completed to obtain the new credentials.
-    Returns:
-        Credentials, the obtained credential.
-    """
-    home_dir = os.path.expanduser('~')
-    credential_dir = os.path.join(home_dir, '.credentials')
-    if not os.path.exists(credential_dir):
-        os.makedirs(credential_dir)
-    credential_path = os.path.join(credential_dir,
-                                   'calendar-python-quickstart.json')
+# def get_credentials():
+#     """Gets valid user credentials from storage.
+#     If nothing has been stored, or if the stored credentials are invalid,
+#     the OAuth2 flow is completed to obtain the new credentials.
+#     Returns:
+#         Credentials, the obtained credential.
+#     """
+#     home_dir = os.path.expanduser('~')
+#     credential_dir = os.path.join(home_dir, '.credentials')
+#     if not os.path.exists(credential_dir):
+#         os.makedirs(credential_dir)
+#     credential_path = os.path.join(credential_dir,
+#                                    'calendar-python-quickstart.json')
     
-    store = Storage(credential_path)
-    credentials = store.get() 
-    if not credentials or credentials.invalid:
-        flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
-        flow.user_agent = APPLICATION_NAME
-        if flags:
-            credentials = tools.run_flow(flow, store, flags)
-        else:  # Needed only for compatibility with Python 2.6
-            credentials = tools.run(flow, store)
-        print('Storing credentials to ' + credential_path)
-    return credentials
+#     store = Storage(credential_path)
+#     credentials = store.get() 
+#     if not credentials or credentials.invalid:
+#         flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+#         flow.user_agent = APPLICATION_NAME
+#         if flags:
+#             credentials = tools.run_flow(flow, store, flags)
+#         else:  # Needed only for compatibility with Python 2.6
+#             credentials = tools.run(flow, store)
+#         print('Storing credentials to ' + credential_path)
+#     return credentials
  
 def main():
     """Shows basic usage of the Google Calendar API.
     Creates a Google Calendar API service object and outputs a list of the next
     10 events on the user's calendar.
     """
-    credentials = get_credentials()
-    http = credentials.authorize(httplib2.Http())
-    service = discovery.build('calendar', 'v3', http=http)
- # This code is to fetch the calendar ids shared with me
+    
+    credentials = service_account.Credentials.from_service_account_file(CLIENT_SECRET_FILE, scopes=SCOPES)
+    delegated_credentials = credentials.with_subject('mohan@qxf2.com')
+    service = googleapiclient.discovery.build('calendar', 'v3', credentials=delegated_credentials) # This code is to fetch the calendar ids shared with me
     # Src: https://developers.google.com/google-apps/calendar/v3/reference/calendarList/list
     page_token = None
     calendar_ids = []
@@ -98,9 +105,9 @@ def main():
                 if 'PTO' in event['summary']:
                     if today in event['start']['date']:
                         count += 1 
-                        pto_name = event['creator']['email'].split("@")[0]
+                        pto_name = event['organizer']['email'].split("@")[0]
                         pto_list.append(pto_name)
-                        print(pto_list)
+    print(*pto_list, sep = "\n")      
     return pto_list
 
 def write_message(daily_message, channel):
@@ -115,3 +122,7 @@ def lambda_handler(event, context):
     for msg in pto_list:
         message = '{}Is on PTO'.format(msg)
         write_message(message, event.get('channel','test'))
+
+if __name__ == "__main__":
+    main()
+    
