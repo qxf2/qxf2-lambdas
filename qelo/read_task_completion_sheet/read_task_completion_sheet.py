@@ -1,9 +1,5 @@
 """
-This script is intended to update R&D task completion data in S3 and DynamoDB, every Saturday.
-    - Read R&D task completion spreadsheet data.
-    - Store the complete data and current quarter data in S3
-    - Update DynamoDB with the current quarter data, if table is not empty
-    - If empty, write the complete spreadsheet data into DynamoDB table
+This script is intended to backup R&D task completion data in S3 and DynamoDB, every Saturday.
 """
 import os
 import utils
@@ -11,26 +7,23 @@ import utils
 def lambda_handler(event, context):
     "Lambda entry point"
     table_empty = False
+    upload_status = 0
+    # Read the spreadsheet
     spreadsheet_data, headers = utils.read_sheet()
-    filtered_data = utils.filter_current_quarter_data(spreadsheet_data)
 
-    #Read the data into a csv
-    complete_data = utils.to_csv(spreadsheet_data, headers)
-    current_quarter_data = utils.to_csv(filtered_data, headers)
+    # Upload spreadsheet data to S3 bucket
+    upload_status = utils.upload_to_s3(spreadsheet_data, headers, \
+        os.environ['COMPLETE_SHEET_S3_KEY'], 'Complete')
+    if upload_status == 1:
+        utils.upload_to_s3(spreadsheet_data, headers, \
+            os.environ['CURRENT_QUARTER_S3_KEY'], \
+            'Current quarter data')
 
-    #Upload the csv files to s3 bucket
-    utils.upload_to_s3(complete_data, os.environ['COMPLETE_SHEET_S3_KEY'])
-    utils.upload_to_s3(current_quarter_data, os.environ['CURRENT_QUARTER_S3_KEY'])
+    # Store the complete spreadsheet data, if the DynamoDB table is empty
+    table_empty = utils.migrate_to_dynamodb()
 
-    #Prepare the data to initiate transfer to DynamoDB
-    prepared_complete_data = utils.prepare_data(os.environ['COMPLETE_SHEET_S3_KEY'])
-    prepared_quarter_data = utils.prepare_data(os.environ['CURRENT_QUARTER_S3_KEY'])
-
-    #Store the complete task completion spreadsheet data, if the DynamoDB table is empty
-    table_empty = utils.migrate_to_dynamodb(prepared_complete_data)
-
-    #Update the DynamoDB with edits to current quarter data
+    # Update the DynamoDB with edits to current quarter data
     if table_empty is False:
-        utils.update_dynamodb(prepared_quarter_data)
+        utils.update_dynamodb()
 
-    return "Read task completion sheet and populated S3 and Dynamodb"
+    return "Read task completion sheet and, populated S3 and Dynamodb"

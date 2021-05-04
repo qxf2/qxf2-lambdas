@@ -5,13 +5,14 @@ import os
 import sys
 import json
 import pytest
+import requests
 import tests.conf.channel_configuration_conf as channel_conf
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 #Defining current file path
 CURR_FILE_PATH = os.path.dirname(os.path.abspath(__file__))
 MESSAGES_PATH = os.path.join(CURR_FILE_PATH, '')
-CULTURE_FILE = os.path.join(MESSAGES_PATH, 'culture.txt')
+DAILY_MESSAGES_URL = 'https://daily-messages.qxf2.com'
 
 #setting environment variable
 os.environ['chat_id']= channel_conf.chat_id
@@ -116,17 +117,15 @@ def get_message(message):
     else:
         print(f'Message body is none')
 
-def compare_message_with_file(message, file_name):
+def compare_message_with_file(message, endpoint, base_url=DAILY_MESSAGES_URL):
     """
-    Compare message with file
+    Compare message with the file on daily-messages app
     """
     result_flag = False
-    with open(file_name, 'r') as file_handler:
-        lines = [line.strip() for line in file_handler]
-        if message in lines:
-            result_flag = True
-        else:
-            result_flag = False
+    response = requests.get(base_url+endpoint)
+    all_messages = response.json().get('msg',[])
+    if message in all_messages:
+        result_flag = True
 
     return result_flag
 
@@ -136,7 +135,8 @@ def validate_message_with_culture_file(message_on_channel):
     """
     result_flag = False
     if message_on_channel is not None:
-        result_flag = compare_message_with_file(message_on_channel,CULTURE_FILE)
+        endpoint = '/culture/all'
+        result_flag = compare_message_with_file(message_on_channel, endpoint)
         if result_flag is True:
             print(Style.CYAN + '---------------------------\
                 ------------------------------------------------')

@@ -8,7 +8,6 @@ import os
 import re
 from datetime import date
 from io import StringIO
-#from oauth2client.service_account import ServiceAccountCredentials
 import boto3
 import gspread
 import pandas as pd
@@ -16,16 +15,23 @@ from botocore.exceptions import ClientError
 from google.oauth2 import service_account
 
 
-
 def get_sheet():
     "Connect to Google Sheets and get the sheet"
-    scope = ['https://www.googleapis.com/auth/drive']
-    #credentials = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scopes=scope)
-    credentials = service_account.Credentials.from_service_account_info(\
-                                        json.loads(os.environ['API_CREDENTIALS']))
-    scoped_credentials = credentials.with_scopes(scope)
-    gspread_obj = gspread.authorize(scoped_credentials)
-    gsheet = gspread_obj.open(os.environ['SHEET_NAME']).worksheet(os.environ['WORKSHEET_NAME'])
+    try:
+        scope = ['https://www.googleapis.com/auth/drive']
+        credentials = service_account.Credentials.from_service_account_info(\
+                            json.loads(os.environ['API_CREDENTIALS']), scopes = scope)
+        gspread_obj = gspread.authorize(credentials)
+        gsheet = gspread_obj.open(os.environ['SHEET_NAME']).worksheet(os.environ['WORKSHEET_NAME'])
+    except gspread.exceptions.SpreadsheetNotFound as spreadsheet_not_found_exception:
+        print(f'\n Spreadsheet by name {os.environ["SHEET_NAME"]} is not found\n!')
+        raise Exception('\n Spreadsheet not found!') from spreadsheet_not_found_exception
+    except gspread.exceptions.WorksheetNotFound as worksheet_not_found_exception:
+        print(f'\n Worksheet by name {os.environ["WORKSHEET_NAME"]} is not found\n!')
+        raise Exception('\n Worksheet not found!') from worksheet_not_found_exception
+    except Exception as error:
+        print(f'\n Python says : {error}\n')
+        raise Exception('\n Unable to read spreadsheet!') from error
     return gsheet
 
 
@@ -87,107 +93,150 @@ def filter_current_quarter_data(spreadsheet_data):
 
 
 def to_csv(data, headers):
-    "Reads the data into a csv"
+    "Writes the data into a csv"
     data = pd.DataFrame(data, columns=headers)
     csv_buffer = StringIO()
     data.to_csv(csv_buffer, index=False)
     return csv_buffer
 
 
-def upload_to_s3(csv_buffer, filename):
-    "Upload the data to s3 bucket"
-    s3_resource = boto3.resource('s3')
-    s3_resource.Object(os.environ['S3_BUCKET'], filename).put(Body=csv_buffer.getvalue())
-    print(f"File uploaded to {os.environ['S3_BUCKET']}, as {filename}.")
+def upload_to_s3(spreadsheet_data, headers, filename, content):
+    "Upload the data to S3 bucket"
+    if content == 'Complete':
+        csv_data = to_csv(spreadsheet_data, headers)
+    else:
+        filtered_data = filter_current_quarter_data(spreadsheet_data)
+        csv_data = to_csv(filtered_data, headers)
+    try:
+        s3_resource = boto3.resource('s3')
+        s3_resource.Object(os.environ['S3_BUCKET'], filename).put(Body=csv_data.getvalue())
+        print(f"{content} backup of R&D task completion data at {os.environ['S3_BUCKET']} S3 bucket, as {filename}")
+        status = 1
+    except ClientError as s3_error:
+        print(f"\n {s3_error.response['Error']['Message']}! \n")
+        raise Exception ('\n Error on upload to S3!') from s3_error
+    except Exception as error:
+        print(f'\n Python says : {error}\n')
+        raise Exception('Error on upload to S3!') from error
+    return status
 
 
 def prepare_data(filename):
-    "Prepare the data to transfer it to dynamodb"
-    s3_client = boto3.client('s3')
-    csv_object = s3_client.get_object(Bucket=os.environ['S3_BUCKET'], Key=filename)
-    csv_file = csv_object['Body'].read().decode('utf-8')
-    data = csv_file.split("\n")
+    "Prepare the data to transfer it to DynamoDB"
+    try:
+        s3_client = boto3.client('s3')
+        csv_object = s3_client.get_object(Bucket=os.environ['S3_BUCKET'], Key=filename)
+        csv_file = csv_object['Body'].read().decode('utf-8')
+        data = csv_file.split("\n")
+    except ClientError as s3_error:
+        print(f"\n {s3_error.response['Error']['Message']}! \n")
+        raise Exception ('\n Error on reading CSV from S3!') from s3_error
+    except Exception as error:
+        print(f'\n Python says : {error}\n')
+        raise Exception('Error on reading CSV from S3!') from error
     return data
 
 
 def init_table(table_name):
     "Initializes and returns the DynamoDB table resource."
-    dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table(table_name)
+    try:
+        dynamodb = boto3.resource('dynamodb')
+        table = dynamodb.Table(table_name)
+    except ClientError as dynamodb_error:
+        print(f"\n {dynamodb_error.response['Error']['Message']}! \n")
+        raise Exception ('\n Error on initializing DynamoDB resource!') from dynamodb_error
+    except Exception as error:
+        print(f'\n Python says : {error}\n')
+        raise Exception('Error on initializing DynamoDB resource!') from error
     return table
 
 
-def initiate_migrate(row_data):
-    "initiates the process of migrating data from s3 to dynamodb"
-    table = init_table(os.environ['TABLE_NAME'])
+def initiate_migrate(row_data, table):
+    "Initiates the process of migrating data from S3 to DynamoDB"
     with table.batch_writer() as batch:
         for email in row_data[4].split(','):
             batch.put_item(
                 Item={
                     "TaskNo": int(row_data[0]),
                     "Task" :row_data[1],
-                    "Date_of_Completion" :row_data[2],
-                    "Trello_Ticket" : row_data[3],
-                    "Email":email,
-                    "Artificat_Location":row_data[5],
+                    "DateOfCompletion" :row_data[2],
+                    "TrelloTicket" : row_data[3],
+                    "Email":email.strip(),
+                    "ArtifactLocation":row_data[5],
                     "Techs" : row_data[6],
-                    "Next_Steps":row_data[7],
-                    "Level_":row_data[8],
-                    "Direct_Parent":row_data[9]
+                    "NextSteps":row_data[7],
+                    "Level":row_data[8],
+                    "Stream":row_data[9],
+                    "Substream":row_data[10],
+                    "Share":row_data[11]
                 }
             )
 
 
-def migrate_to_dynamodb(data):
-    "Populate dynamodb with complete sheet data"
+def migrate_to_dynamodb():
+    "Populate DynamoDB with complete sheet data"
+    is_empty = False
+    #Prepare the data to initiate transfer to DynamoDB
+    data = prepare_data(os.environ['COMPLETE_SHEET_S3_KEY'])
     table = init_table(os.environ['TABLE_NAME'])
     if table.item_count == 0 :
+        is_empty = True
         for row_data in  csv.reader(data[1:], quotechar='"',\
             delimiter=',', quoting=csv.QUOTE_ALL, skipinitialspace=True):
             if row_data:
                 try:
-                    initiate_migrate(row_data)
-                except ClientError as error:
-                    if error.response['Error']['Code'] == 'ConditionalCheckFailedException':
-                        pass
-        print(f"File migrated to Dynamodb, in {os.environ['TABLE_NAME']} table.")
-        return True
-    else:
-        return False
+                    initiate_migrate(row_data, table)
+                except ClientError as dynamodb_error:
+                    print(f"\n Error while migrating data into table {os.environ['TABLE_NAME']}: \n {dynamodb_error.response}")
+                    raise Exception('Exception encountered and run aborted!.') from dynamodb_error
+                except Exception as error:
+                    raise Exception('Exception while migrating data into table.') from error
+        print(f"R&D task completion data migrated to {os.environ['TABLE_NAME']} table in DynamoDB.")
+    return is_empty
 
-def initiate_update(row_data):
-    "initiates the updating of current quarter data in the dynamodb"
-    table = init_table(os.environ['TABLE_NAME'])
+
+def initiate_update(row_data, table):
+    "Initiates the updation of current quarter data into DynamoDB"
     for email in row_data[4].split(','):
         table.update_item(
-            Key={
-                "TaskNo": int(row_data[0]), #primary key
-                "Email": email, #sort key
-            },
-            UpdateExpression="SET Task = :att1,\
-                Date_of_Completion = :att2, Trello_Ticket = :att3,\
-                Artificat_Location= :att5, Techs = :att6,\
-                Next_Steps= :att7, Level_= :att8, Direct_Parent= :att9",
+            ExpressionAttributeNames= {"#lev":"Level", "#s":"Stream", "#sh":"Share"},
             ExpressionAttributeValues={
                 ":att1":row_data[1], # Task attribute
-                ":att2":row_data[2], # Date_of_Completion attribute
-                ":att3":row_data[3], # Trello_Ticket attribute
-                ":att5":row_data[5], # Artificat_Location attribute
+                ":att2":row_data[2], # DateOfCompletion attribute
+                ":att3":row_data[3], # TrelloTicket attribute
+                ":att5":row_data[5], # ArtifactLocation attribute
                 ":att6":row_data[6], # Techs attribute
-                ":att7":row_data[7], # Next_Steps attribute
-                ":att8":row_data[8], # Level_ attribute
-                ":att9":row_data[9]  # Direct_Parent attribute
-            }
+                ":att7":row_data[7], # NextSteps attribute
+                ":Level":row_data[8], # Level attribute
+                ":Stream":row_data[9], # Stream attribute
+                ":att10":row_data[10],# Substream attribute
+                ":Share":row_data[11] # Share attribute
+            },
+            Key={
+                "TaskNo": int(row_data[0]), #primary key
+                "Email": email.strip(), #sort key
+            },
+            UpdateExpression="SET Task = :att1,\
+                DateOfCompletion = :att2, TrelloTicket = :att3,\
+                ArtifactLocation = :att5, Techs = :att6,\
+                NextSteps = :att7, #lev = :Level, #s = :Stream,\
+                Substream = :att10, #sh = :Share"
         )
 
 
-def update_dynamodb(data):
+def update_dynamodb():
     "Update the dynamodb with the current quarter data"
+    data = prepare_data(os.environ['CURRENT_QUARTER_S3_KEY'])
+    table = init_table(os.environ['TABLE_NAME'])
     for row_data in  csv.reader(data[1:], quotechar='"',\
         delimiter=',', quoting=csv.QUOTE_ALL, skipinitialspace=True):
         if row_data:
             try:
-                initiate_update(row_data)
+                initiate_update(row_data, table)
+            except ClientError as dynamodb_error:
+                print(f"\n Error while updating data into table {os.environ['TABLE_NAME']}: \n {dynamodb_error.response}")
+                raise Exception('Exception encountered and run aborted!.') from dynamodb_error
             except Exception as exception:
-                print(f"Failed with exception {exception.__class__.__name__}")
-    print(f"Updated {os.environ['TABLE_NAME']} table with current quarter data .")
+                print(f"\n Failed with exception {exception.__class__.__name__}")
+                raise Exception('Exception while updating data into table.') from exception
+    print(f"Updated {os.environ['TABLE_NAME']} table in DynamoDB with current quarters R&D task completion data.")
