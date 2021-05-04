@@ -1,8 +1,0 @@
-{
-    "s3_bucket": "task-completion-data",
-    "current_quarter_s3_key":"prod_current_quarter_data.csv",
-    "complete_sheet_s3_key": "prod_task_completion_data.csv",
-    "sheet_name" : "R&D task completion form",
-    "worksheet_name": "Task list",
-    "table_name": "prod_task_completion_data"
-}
