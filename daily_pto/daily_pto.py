@@ -88,7 +88,3 @@ def lambda_handler(event, context):
     for msg in pto_list:
         message = '{}Is on PTO'.format(msg)
         write_message(message, event.get('channel','test'))
-
-if __name__ == "__main__":
-    main()
-    
