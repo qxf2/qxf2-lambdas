@@ -9,11 +9,11 @@ import os
 import json
 import boto3
 import datetime
-from oauth2client import client
-from oauth2client import tools
-from oauth2client.file import Storage
+# from oauth2client import client
+# from oauth2client import tools
+# from oauth2client.file import Storage
 from google.oauth2 import service_account
-from apiclient.discovery import build
+# from apiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
 from oauth2client.client import GoogleCredentials
 import googleapiclient.discovery
@@ -56,7 +56,6 @@ def main():
     today = start_date.split("T")[0]
     end_date = datetime.datetime(year,month,date, 23, 59, 59, 0).isoformat() + 'Z'
     for calendar_id in calendar_ids:
-        count = 0
         eventsResult = service.events().list(
             calendarId=calendar_id,
             timeMin=start_date,
@@ -69,7 +68,6 @@ def main():
             if event.__contains__('summary'):
                 if 'PTO' in event['summary']:
                     if today in event['start']['date']:
-                        count += 1 
                         pto_name = event['organizer']['email'].split("@")[0]
                         pto_list.append(pto_name)
     print(*pto_list, sep = "\n")      
@@ -86,6 +84,3 @@ def lambda_handler(event, context):
     pto_list = main() 
     message = 'PTO today:\n{}'.format("\n".join(pto_list[0:]))
     write_message(message, event.get('channel','test'))
-
-if __name__ == "__main__":
-    main()
