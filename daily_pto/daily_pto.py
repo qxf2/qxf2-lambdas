@@ -7,6 +7,7 @@ from __future__ import print_function
 import httplib2
 import os
 import json
+import boto3
 import datetime
 from oauth2client import client
 from oauth2client import tools
@@ -20,18 +21,17 @@ import googleapiclient.discovery
 # If modifying these scopes, delete your previously saved credentials
 # at ~/.credentials/calendar-python-quickstart.json
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
-# CLIENT_SECRET_FILE = os.path.join(os.path.dirname(__file__),'client_secret_google_calendar.json')
-CLIENT_SECRET_FILE = 'client_secret_google_calendar.json'
-SUBJECT = 'mohan@qxf2.com'
- 
+CLIENT_SECRET_FILE = json.loads(os.environ['client_secret_google_calendar'])
+QUEUE_URL = 'https://sqs.ap-south-1.amazonaws.com/285993504765/skype-sender'
+
 def main():
     """Shows basic usage of the Google Calendar API.
     Creates a Google Calendar API service object and outputs a list of the next
     10 events on the user's calendar.
     """
-    credentials = service_account.Credentials.from_service_account_file(CLIENT_SECRET_FILE, scopes=SCOPES)
+    credentials = service_account.Credentials.from_service_account_info(CLIENT_SECRET_FILE, scopes=SCOPES)
     delegated_credentials = credentials.with_subject('mohan@qxf2.com')
-    service = googleapiclient.discovery.build('calendar', 'v3', credentials=delegated_credentials) 
+    service = googleapiclient.discovery.build('calendar', 'v3', credentials=delegated_credentials, cache_discovery=False) 
     # This code is to fetch the calendar ids shared with me
     # Src: https://developers.google.com/google-apps/calendar/v3/reference/calendarList/list
     page_token = None
@@ -55,7 +55,6 @@ def main():
     start_date = datetime.datetime.now().replace(microsecond=0).isoformat() + 'Z'
     today = start_date.split("T")[0]
     end_date = datetime.datetime(year,month,date, 23, 59, 59, 0).isoformat() + 'Z'
-    print("Today's PTO List:")
     for calendar_id in calendar_ids:
         count = 0
         eventsResult = service.events().list(
@@ -85,6 +84,8 @@ def write_message(daily_message, channel):
 def lambda_handler(event, context):
     "Lambda entry point"
     pto_list = main() 
-    for msg in pto_list:
-        message = '{}Is on PTO'.format(msg)
-        write_message(message, event.get('channel','test'))
+    message = 'PTO today:\n{}'.format("\n".join(pto_list[0:]))
+    write_message(message, event.get('channel','test'))
+
+if __name__ == "__main__":
+    main()
