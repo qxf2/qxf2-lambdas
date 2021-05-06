@@ -9,17 +9,12 @@ import os
 import json
 import boto3
 import datetime
-# from oauth2client import client
-# from oauth2client import tools
-# from oauth2client.file import Storage
 from google.oauth2 import service_account
-# from apiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
-from oauth2client.client import GoogleCredentials
 import googleapiclient.discovery
  
 # If modifying these scopes, delete your previously saved credentials
-# at ~/.credentials/calendar-python-quickstart.json
+# at ~/.credentials/client_secret_google_calendar.json
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 CLIENT_SECRET_FILE = json.loads(os.environ['client_secret_google_calendar'])
 QUEUE_URL = 'https://sqs.ap-south-1.amazonaws.com/285993504765/skype-sender'
@@ -32,6 +27,7 @@ def main():
     credentials = service_account.Credentials.from_service_account_info(CLIENT_SECRET_FILE, scopes=SCOPES)
     delegated_credentials = credentials.with_subject('mohan@qxf2.com')
     service = googleapiclient.discovery.build('calendar', 'v3', credentials=delegated_credentials, cache_discovery=False) 
+
     # This code is to fetch the calendar ids shared with me
     # Src: https://developers.google.com/google-apps/calendar/v3/reference/calendarList/list
     page_token = None
@@ -45,7 +41,8 @@ def main():
         page_token = calendar_list.get('nextPageToken')
         if not page_token:
             break
-    # This code is to look for all-day events in each calendar for the month
+
+    # This code is to look for all-day events in each calendar for the month and filter out PTO events
     # Src: https://developers.google.com/google-apps/calendar/v3/reference/events/list
     # You need to get this from command line
     now = datetime.datetime.now() # current date and time
@@ -70,7 +67,6 @@ def main():
                     if today in event['start']['date']:
                         pto_name = event['organizer']['email'].split("@")[0]
                         pto_list.append(pto_name)
-    print(*pto_list, sep = "\n")      
     return pto_list
 
 def write_message(daily_message, channel):
