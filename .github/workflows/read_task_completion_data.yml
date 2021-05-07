@@ -1,8 +1,8 @@
-name: deploy-read-task-completion-data
+name: deploy-prod-read-task-completion-data
 on:
   push:
     branches:
-      - 'update_task_completion_data_backup_lambda'
+      - master
     paths:
       - 'qelo/read_task_completion_sheet/**'
 jobs:
@@ -15,7 +15,7 @@ jobs:
       with:
         lambda_directory: 'qelo/read_task_completion_sheet/'
         lambda_function_name: 'arn:aws:lambda:ap-south-1:285993504765:function:prod-read-task-completion-data'
-        lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:task-completion-data-backup:1'
+        lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:task-completion-data-backup'
         requirements_txt: 'qelo/read_task_completion_sheet/requirements.txt'
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
