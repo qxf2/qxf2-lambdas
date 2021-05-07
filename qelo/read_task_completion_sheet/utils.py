@@ -8,7 +8,6 @@ import os
 import re
 from datetime import date
 from io import StringIO
-#from oauth2client.service_account import ServiceAccountCredentials
 import boto3
 import gspread
 import pandas as pd
@@ -16,15 +15,12 @@ from botocore.exceptions import ClientError
 from google.oauth2 import service_account
 
 
-
 def get_sheet():
     "Connect to Google Sheets and get the sheet"
     scope = ['https://www.googleapis.com/auth/drive']
-    #credentials = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scopes=scope)
     credentials = service_account.Credentials.from_service_account_info(\
-                                        json.loads(os.environ['API_CREDENTIALS']))
-    scoped_credentials = credentials.with_scopes(scope)
-    gspread_obj = gspread.authorize(scoped_credentials)
+                        json.loads(os.environ['API_CREDENTIALS']), scopes = scope)
+    gspread_obj = gspread.authorize(credentials)
     gsheet = gspread_obj.open(os.environ['SHEET_NAME']).worksheet(os.environ['WORKSHEET_NAME'])
     return gsheet
 
