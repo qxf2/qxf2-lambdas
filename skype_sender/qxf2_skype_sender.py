@@ -17,7 +17,7 @@ def get_dict(my_string):
 def get_channel_id(msg_body):
     "Return the channel id, default to main if channel not available"
     channel = msg_body.get('channel','main')
-    if channel[-6:].lower() == '.skype':
+    if channel[-6:].lower() != '.skype':
         channel = channel.lower()
     channels = get_dict(os.environ.get('SKYPE_CHANNELS'))
     channel_id = channels.get(channel,channel)
