@@ -1,9 +1,5 @@
 """
-This script is intended to update R&D task completion data in S3 and DynamoDB, every Saturday.
-    - Read R&D task completion spreadsheet data.
-    - Store the complete data and current quarter data in S3
-    - Update DynamoDB with the current quarter data, if table is not empty
-    - If empty, write the complete spreadsheet data into DynamoDB table
+This script is intended to backup R&D task completion data in S3 and DynamoDB, every Saturday.
 """
 import os
 import utils
