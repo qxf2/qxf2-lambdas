@@ -19,8 +19,9 @@ def lambda_handler(event, context):
     current_quarter_data = utils.to_csv(filtered_data, headers)
 
     #Upload the csv files to s3 bucket
-    utils.upload_to_s3(complete_data, os.environ['COMPLETE_SHEET_S3_KEY'])
-    utils.upload_to_s3(current_quarter_data, os.environ['CURRENT_QUARTER_S3_KEY'])
+    utils.upload_to_s3(complete_data, os.environ['COMPLETE_SHEET_S3_KEY'], 'Full')
+    utils.upload_to_s3(current_quarter_data,\
+        os.environ['CURRENT_QUARTER_S3_KEY'], 'Current quarter data')
 
     #Prepare the data to initiate transfer to DynamoDB
     prepared_complete_data = utils.prepare_data(os.environ['COMPLETE_SHEET_S3_KEY'])
