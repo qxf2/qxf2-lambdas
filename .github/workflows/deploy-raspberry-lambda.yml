@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Deploy code to Lambda
-      uses: sravantit25/py-lambda-action@v1.0.2
+      uses: sravantit25/py-lambda-action
       with:
         # lambda_directory: 'raspberry_pi'
         lambda_function_name: arn:aws:lambda:ap-south-1:285993504765:function:notify-colleagues
