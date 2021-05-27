@@ -15,7 +15,7 @@ jobs:
       with:
         #lambda_function_name: 'test-raspberry-pi'
         lambda_directory: 'raspberry_pi'
-        lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:test-without-function-have-directory'
+        lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:test-without-function-have-directory-updated'
         requirements_txt: 'raspberry_pi/requirements.txt'
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
