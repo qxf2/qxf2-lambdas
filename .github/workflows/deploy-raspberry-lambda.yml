@@ -13,7 +13,9 @@ jobs:
     - name: Deploy code to Lambda
       uses: sravantit25/py-lambda-action@master
       with:
-        lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:test-arn-creation'
+        lambda_function_name: 'test-raspberry-pi'
+        lambda_directory: 'raspberry_pi'
+        lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:test-all-conditions'
         requirements_txt: 'raspberry_pi/requirements.txt'
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
