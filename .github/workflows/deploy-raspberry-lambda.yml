@@ -2,7 +2,7 @@ name: deploy-raspberry-lambda
 on:
   push:
     branches:
-      - make_lambda_code_optional
+      - make_lambda_code_optional_testettt
     # paths:
     #   - 'raspberry_pi/**'
 jobs:
