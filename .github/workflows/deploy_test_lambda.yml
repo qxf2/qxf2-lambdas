@@ -1,0 +1,21 @@
+name: deploy-test-lambda
+on:
+  push:
+    branches:
+      - make_lambda_code_optional
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Deploy code to Lambda
+      uses: sravantit25/py-lambda-action@master
+      with:
+        #lambda_function_name: 'test-raspberry-pi'
+        lambda_directory: 'test_py_action_lambda'
+        lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:test-py-action-without-function'
+        requirements_txt: 'test_py_action_lambda/requirements.txt'
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ secrets.SKYPE_SENDER_REGION }} 
