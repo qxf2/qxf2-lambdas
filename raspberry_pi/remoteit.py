@@ -1,6 +1,6 @@
 import requests
 import json
-import paramiko
+#import paramiko
 import time
 import credentials as credentials
 
@@ -8,6 +8,7 @@ import credentials as credentials
 developerkey = credentials.developerkey
 
 def login():
+  print("THis is the login method")
   login_url = "https://api.remot3.it/apv/v27/user/login"
   payload = "{\"username\": \"" + credentials.username + "\",\"password\": \"" + credentials.password + "\"}"
   #print(payload)
@@ -19,8 +20,9 @@ def login():
   #print(response.text)
   login_data = json.loads(response.text)
   token = login_data['token']
-  #print("the token is", token)
-  return token
+  print("the token is", token)
+  #return token
+  
 
 token = login()
 
@@ -64,7 +66,7 @@ def get_device_hostport_list():
       server_list.append({'proxy_server':proxy_server, 'proxy_port':proxy_port})
   return server_list
 
-
+"""
 def run_command():
   proxy_data_list = get_device_hostport_list()
   i = 0
@@ -95,7 +97,8 @@ def run_command():
     except Exception as e:
       print(e)
     i = i + 1
-
+"""
 def run_command_in_pi(event, context):
     "lambda entry point"
-    return run_command()
+    #return run_command()
+    login()
