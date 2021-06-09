@@ -9,9 +9,9 @@ def action_handler(event, context):
     response = requests.get('https://api.github.com')
     print("The respone is ", response)
     if response.status_code == 200:
-        print('Success!')
+        print('Success for code review!')
     elif response.status_code == 404:
-        print('Not Found.')
+        print('Not Found for code review!.')
 
 
 if __name__ == "__main__":
