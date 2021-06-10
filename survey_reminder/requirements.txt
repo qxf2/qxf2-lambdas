@@ -1,0 +1,4 @@
+boto3==1.17.90
+python-dateutil==2.8.1
+requests==2.25.1
+
