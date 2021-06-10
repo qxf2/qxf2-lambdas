@@ -15,7 +15,7 @@ jobs:
       with:
         lambda_directory: 'survey_reminder'
         lambda_function_name: 'arn:aws:lambda:ap-south-1:285993504765:function:survey-reminder'
-        lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:survey-reminder:1'
+        lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:survey-reminder'
         requirements_txt: 'survey_reminder/requirements.txt'
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

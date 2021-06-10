@@ -11,7 +11,7 @@ from datetime import date
 
 BASE_URL = 'https://qxf2-employees.qxf2.com/graphql'
 QUEUE_URL = 'https://sqs.ap-south-1.amazonaws.com/285993504765/skype-sender'
-NOT_RESPONDED_USERS_URL = ''
+NOT_RESPONDED_USERS_URL = os.environ.get('NOT_RESPONDED_USERS_URL')
 
 def authenticate():
     "Return an authenticate code"
