@@ -1,0 +1,30 @@
+name: test-workanniversary-image
+on:
+  push:
+    branches:
+      - test_work_anniversary_image
+    paths:
+      - 'qxf2-lambdas/**'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Copy necessary files from Work Anniversary lambda
+      run: |
+        cp work-anniversary/anniversary_quotes.txt test_workanniversary_image
+        cp work-anniversary/Work_anniversary_template.png test_workanniversary_image
+      shell: bash
+      working-directory : qxf2-lambdas
+    - uses: actions/checkout@master
+    - name: Deploy code to Lambda
+      uses: qxf2/py-lambda-action@v1.0.2
+      with:
+        lambda_directory: 'test_workanniversary_image'
+        lambda_function_name: 'arn:aws:lambda:ap-south-1:285993504765:function:test-workanniversary-image'
+        lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:testWorkAnniversaryImage'
+        requirements_txt: 'test_workanniversary_image/requirements.txt'
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ secrets.SKYPE_SENDER_REGION }}
