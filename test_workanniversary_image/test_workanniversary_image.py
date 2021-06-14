@@ -18,7 +18,7 @@ from PIL import Image
 BASE_URL = 'https://qxf2-employees.qxf2.com/graphql'
 
 #TODO: Remove these once deployed in the lambda
-#Put user credentials file
+#Put user credentials file in the lambda
 USERNAME = "rohanJ"
 PASSWORD = "1. b3 e5 2. Bb2 f6!"
 
