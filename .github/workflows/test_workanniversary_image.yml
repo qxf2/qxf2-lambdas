@@ -4,7 +4,7 @@ on:
     branches:
       - test_work_anniversary_image
     paths:
-      - 'qxf2-lambdas/**'
+      - 'test_workanniversary_image/**'
 jobs:
   build:
     runs-on: ubuntu-latest
