@@ -12,10 +12,10 @@ jobs:
     - uses: actions/checkout@master
     - name: Copy necessary files from Work Anniversary lambda
       run: |
+        ls
         cp work-anniversary/anniversary_quotes.txt test_workanniversary_image
         cp work-anniversary/Work_anniversary_template.png test_workanniversary_image
       shell: bash
-      working-directory : qxf2-lambdas
     - uses: actions/checkout@master
     - name: Deploy code to Lambda
       uses: qxf2/py-lambda-action@v1.0.2
