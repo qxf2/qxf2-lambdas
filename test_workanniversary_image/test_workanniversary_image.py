@@ -12,7 +12,6 @@ import requests
 import cv2
 import pytesseract
 
-
 BASE_URL = 'https://qxf2-employees.qxf2.com/graphql'
 
 # TODO: Remove these once deployed in the lambda

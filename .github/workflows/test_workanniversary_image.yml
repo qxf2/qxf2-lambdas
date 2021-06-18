@@ -22,7 +22,7 @@ jobs:
       with:
         lambda_directory: 'test_workanniversary_image'
         lambda_function_name: 'arn:aws:lambda:ap-south-1:285993504765:function:test-workanniversary-image'
-        lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:opencv-tesseract'
+        lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:opencv-tesseract:1'
         requirements_txt: 'test_workanniversary_image/requirements.txt'
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
