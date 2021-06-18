@@ -15,7 +15,6 @@ import pytesseract
 BASE_URL = 'https://qxf2-employees.qxf2.com/graphql'
 
 # TODO: Remove these once deployed in the lambda
-# Put user credentials file in the lambda
 USERNAME = "sravanti"
 PASSWORD = "1. e4 e5 2. d4 exd4"
 
