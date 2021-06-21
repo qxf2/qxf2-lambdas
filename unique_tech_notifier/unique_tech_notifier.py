@@ -33,7 +33,7 @@ def get_unique_tech():
     if len(unique_tech_list) != 0:
         msg = "List of unique techs learnt this week:\n"+"\n".join(unique_tech_list)
     else:
-        msg = "No unique techs learnt this week!! :("
+        msg = "*No unique techs* learnt this week!! :("
     return msg
 
 
