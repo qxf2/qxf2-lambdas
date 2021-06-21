@@ -7,7 +7,7 @@ import os
 import boto3
 import json
 import requests
-from datetime import date
+from datetime import datetime
 
 BASE_URL = 'https://qxf2-employees.qxf2.com/graphql'
 QUEUE_URL = 'https://sqs.ap-south-1.amazonaws.com/285993504765/skype-sender'
@@ -51,6 +51,12 @@ def get_all_employees():
     return all_employees
 
 
+def get_non_responded_users():
+    "Gets a list of people who have not filled survey"
+    response = requests.get(NOT_RESPONDED_USERS_URL, headers={'Accept': 'application/json', 'User': os.environ.get('AUTHORISED_USER')})
+    return response
+
+
 def write_message(survey_reminder_message, channel):
     "Send a message to Skype Sender"
     sqs = boto3.client('sqs')
@@ -59,29 +65,22 @@ def write_message(survey_reminder_message, channel):
 
 
 def survey_reminder():
+    "Remind Qxf2 employees to take survey"
     emp_data = get_all_employees()
-    if date.today().weekday() == 3:
+    non_responded_users = get_non_responded_users()
+    users = [user['email'] for user in non_responded_users.json()]
+    user_names = [user['fullName'] for user in non_responded_users.json()]
+
+    if datetime.now().strftime("%H") == os.environ.get('HOUR'):
         for each_node in emp_data:
-            msg = f"Hey {each_node['node']['firstname']} ,it's time to take the Help Survey: {os.environ.get('HELP_SURVEY_URL')} "
-            write_message(msg, '8:'+each_node['node']['skypeId'])
-    elif date.today().weekday() == 4:
-        non_responded_users = requests.get(NOT_RESPONDED_USERS_URL, headers={
-                                           'Accept': 'application/json', 'User': os.environ.get('AUTHORISED_USER')})
-        users = [user['email'] for user in non_responded_users.json()]
-        user_names = [user['fullName'] for user in non_responded_users.json()]
-
-        if (len(users) == 0):
-            msg = "Thank you all for submitting help survey on time!!"
-            write_message(msg, os.environ.get('CHANNEL_ID'))
-        else:
-            for each_node in emp_data:
-                if each_node['node']['email'] in users:
-                    msg = f"Hey {each_node['node']['firstname']},\nReminder to take Help Survey: {os.environ.get('HELP_SURVEY_URL')}"
-                    write_message(msg, '8:'+each_node['node']['skypeId'])
-            group_msg = "List of People who have not submitted help survey \n " + \
+            if each_node['node']['email'] in users:
+                msg = f"Hey {each_node['node']['firstname']},\nReminder to take Help Survey: {os.environ.get('HELP_SURVEY_URL')}"
+                write_message(msg, '8:'+each_node['node']['skypeId'])
+    else:
+        group_msg = "List of People who have not submitted help survey \n " + \
                 "\n" .join(user_names)
-            write_message(group_msg, os.environ.get('CHANNEL_ID'))
-
+        write_message(group_msg, os.environ.get('CHANNEL_ID'))
+        
 
 def lambda_handler(event, context):
     "lambda entry point"
