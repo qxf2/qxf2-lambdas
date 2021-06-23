@@ -1,7 +1,7 @@
 """
 This Lambda will :
-   - Get a list of active Qxf2 employees skype id every thursday and remind them to fill the survey via skype sender
-   - Get a list of Qxf2 employees who have not filled the survey every friday and remind them one more time to fill the survey via skype sender
+    - Get a list of Qxf2 employees who have not filled the survey every friday and remind them one more time to fill the survey via skype sender
+    - In addition lambda will post a message on skype channel with a list of users who missed filling the survey at eod
 """
 import os
 import boto3
@@ -9,47 +9,16 @@ import json
 import requests
 from datetime import datetime
 
-BASE_URL = 'https://qxf2-employees.qxf2.com/graphql'
 QUEUE_URL = 'https://sqs.ap-south-1.amazonaws.com/285993504765/skype-sender'
 NOT_RESPONDED_USERS_URL = os.environ.get('NOT_RESPONDED_USERS_URL')
 
-
-def authenticate():
-    "Return an authenticate code"
-    query = f"""mutation {{
-        auth(password: "{os.environ.get('PASSWORD')}", username:"{os.environ.get('USERNAME')}" ) {{
-            accessToken
-            refreshToken
-            }}
-        }}
-    """
-    response = requests.post(url=BASE_URL, json={'query': query})
-    return response.json().get('data', {}).get('auth', {}).get('accessToken', None)
-
-
 def get_all_employees():
-    "Query allEmployees"
-    query = """query
-    findAllEmployees{
-        allEmployees{
-            edges{
-                node{
-                    email
-                    firstname
-                    skypeId
-                    isActive
-                }
-            }
-        }
-    }"""
-    access_token = authenticate()
-    headers = {'Authorization': f'Bearer {access_token}'}
-    response = requests.get(
-        url=BASE_URL, json={'query': query}, headers=headers)
-    all_employees = response.json().get('data', {}).get(
-        'allEmployees', {}).get('edges', [])
-    return all_employees
-
+    "get all employees data"
+    invokeLambda = boto3.client('lambda',region_name=os.environ.get('REGION_NAME'))
+    response = invokeLambda.invoke(FunctionName=os.environ.get('EMPLOYEES_LAMBDA_NAME'),InvocationType="RequestResponse")
+    emp_data = json.loads(response['Payload'].read())['body']
+    return emp_data
+    
 
 def get_non_responded_users():
     "Gets a list of people who have not filled survey"
@@ -71,7 +40,7 @@ def survey_reminder():
     users = [user['email'] for user in non_responded_users.json()]
     user_names = [user['fullName'] for user in non_responded_users.json()]
 
-    if datetime.now().strftime("%H") == os.environ.get('HOUR'):
+    if (datetime.now().strftime("%H") == os.environ.get('HOUR')):
         for each_node in emp_data:
             if each_node['node']['email'] in users:
                 msg = f"Hey {each_node['node']['firstname']},\nReminder to take Help Survey: {os.environ.get('HELP_SURVEY_URL')}"
