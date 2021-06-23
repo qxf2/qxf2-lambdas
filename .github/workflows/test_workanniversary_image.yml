@@ -18,7 +18,7 @@ jobs:
       shell: bash
     - uses: actions/checkout@master
     - name: Deploy code to Lambda
-      uses: qxf2/py-lambda-action@v1.0.2
+      uses: sravantit25/py-lambda-action@master
       with:
         lambda_directory: 'test_workanniversary_image'
         lambda_function_name: 'arn:aws:lambda:ap-south-1:285993504765:function:test-workanniversary-image'
