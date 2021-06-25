@@ -12,7 +12,7 @@ We are really not sure how to distribute code among repos when maintaining a mic
 4.Minimum Python version requirement is 3.7+
 
 ### How to run End to End tests
-Please run the test using command `python -m pytest tests/test_end_to_end__employee_skype_message.py -sv`
+Please run the test using command `python -m pytest tests/test_end_to_end_employee_skype_message.py -sv`
 
 ### How to run Unit test?
 You can run test using command `coverage run -m pytest tests/test_integration_daily_messages_lambda.py`. Before running test please ensure that you have setup with `aws_access_key_id`, `aws_secret_access_key` and `region` in the `credentials` file located under `.aws` folder. In case this folder is not available then please create a folder in the root directory and add `credentials` file there.
