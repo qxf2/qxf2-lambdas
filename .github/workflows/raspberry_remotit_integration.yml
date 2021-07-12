@@ -4,7 +4,7 @@ on:
     branches:
       - deploy_raspberry_lambda
     paths:
-      - 'raspberry_remoteit/**'
+      - 'raspberry_remoteit_integration/**'
 jobs:
   build:
     runs-on: ubuntu-latest
