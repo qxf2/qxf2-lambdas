@@ -87,7 +87,7 @@ def run_command():
 
       ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("ls -l")
       lines = ssh_stdout.readlines()
-      ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("call_out_to_colleagues.py")
+      ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("python call_out_to_colleagues.py")
       lines.append(ssh_stdout.readlines())
       print("Output from device " + str(i) + " is: \n" + str(lines) + "\n")
  
