@@ -12,8 +12,3 @@ log_group_bot_sender='/aws/lambda/qxf2-bot-sender'
 ptr_value = 'results_0_3_value'
 record_body = 'logRecord_Records.0.body'
 record_messageid = 'logRecord_Records.0.messageId'
-
-# cloodwatch configuration for pto detector
-pto_log_group = '/aws/lambda/pto_detector'
-query_pto_detector = f"fields @timestamp, @message|filter @message like 'Test: I am not on PTO today, blah, 19:f33e901e871d4c3c9ebbbbee66e59ebe@thread.skype'"
-query_pto_detector_flag = f"fields @timestamp, @message, @logStream|filter @message like 'False'"
