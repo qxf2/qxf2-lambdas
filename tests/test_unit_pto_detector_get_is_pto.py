@@ -5,7 +5,7 @@ import requests
 from parameterized import parameterized_class
 
 @parameterized_class(("url", "message", "score", "expected_status_code"), [
-   ("https://practice-testing-ai-ml.qxf2.com/is-pto","I am on PTO today", 1, 200),
+   ("https://practice-testing-ai-ml.qxf2.com/is-pto","I am sick out today", 1, 200),
    ("https://practice-testing-ai-ml.qxf2.com/is-pto","I am happy today", 0, 200),
 ])
 
