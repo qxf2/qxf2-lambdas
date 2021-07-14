@@ -15,7 +15,7 @@ jobs:
       run: |
         ls
         cp work-anniversary/Work_anniversary_template.png anniversary_image_test
-        cp work-anniversary/anniversary_quotes anniversary anniversary_image_test
+        cp work-anniversary/anniversary_quotes.txt anniversary_image_test
       shell: bash
 
     - uses: actions/checkout@master
