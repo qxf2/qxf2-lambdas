@@ -13,9 +13,7 @@ jobs:
     - uses: actions/checkout@master
     - name: Copy the template file
       run: |
-        ls
-        cp work-anniversary/Work_anniversary_template.png anniversary_image_test
-        cp work-anniversary/anniversary_quotes.txt anniversary_image_test
+        cp work-anniversary/Work_anniversary_template.png work-anniversary/anniversary_quotes.txt anniversary_image_test
       shell: bash
 
     - uses: actions/checkout@master
