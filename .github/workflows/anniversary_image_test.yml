@@ -13,11 +13,9 @@ jobs:
     - uses: actions/checkout@master
     - name: Copy the template file
       run: |
-        cp work-anniversary/Work_anniversary_template.png anniversary_image_test
-        cp work-anniversary/anniversary_quotes.txt anniversary_image_test
+        cp work-anniversary/Work_anniversary_template.png anniversary_image_test/
+        cp work-anniversary/anniversary_quotes.txt anniversary_image_test/
       shell: bash
-
-    - uses: actions/checkout@master
     - name: Deploy code to Lambda
       uses: qxf2/py-lambda-action@v1.0.2
       with:
