@@ -6,7 +6,6 @@ This Lambda will :
 """
 import os
 import json
-from datetime import datetime
 import boto3
 import requests
 
@@ -54,9 +53,9 @@ def get_group_message():
     write_message(group_msg, os.environ.get('CHANNEL_ID'))
 
 
-def survey_reminder():
+def survey_reminder(msg_type):
     "Remind Qxf2 employees to take survey"
-    if datetime.now().strftime("%H") == os.environ.get('HOUR'):
+    if msg_type == 'individual':
         get_individual_message()
     else:
         get_group_message()
@@ -64,4 +63,4 @@ def survey_reminder():
 
 def lambda_handler(event, context):
     "lambda entry point"
-    survey_reminder()
+    survey_reminder(event['msg_type'])
