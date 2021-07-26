@@ -2,7 +2,7 @@ name: deploy-survey-reminder
 on:
   push:
     branches:
-      - survey-reminder
+      - master
     paths:
       - 'survey_reminder/**'
 jobs:
