@@ -2,7 +2,9 @@
 Simplest lambda to play with GitHub actions
 """
 import json
+import os
 import boto3
+import requests
 import re
 
 
@@ -29,10 +31,10 @@ def lambda_handler(event, context):
     user = content['user_id']
     print(f'{message}, {user}, {channel}')
     
-    if channel == os.environ.get('ETC_CHANNEL') and user != os.environ.get('Qxf2Bot_USER')::
+    if channel == os.environ.get('ETC_CHANNEL') and user != os.environ.get('Qxf2Bot_USER'):
         url = get_url(message)
         if url:
             print("Call the API")
         else:
             print("No API found")
-
+        print("Somthing happened!!!")
