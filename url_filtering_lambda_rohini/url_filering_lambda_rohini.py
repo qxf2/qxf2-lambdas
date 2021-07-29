@@ -22,6 +22,11 @@ def get_url(message):
     regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
     url = re.findall(regex,message)      
     return [x[0] for x in url]
+
+def get_url_from_message(message):
+    print("Inside get_url_from_message ")
+    if "href" in message:
+        print(message)
     
 
 def lambda_handler(event, context):
@@ -38,3 +43,4 @@ def lambda_handler(event, context):
         else:
             print("No API found")
         print("Somthing happened!!!")
+        href_url = get_url_from_message(message)
