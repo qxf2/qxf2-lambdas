@@ -30,10 +30,14 @@ def get_url(message):
     return [x[0] for x in url]
 
 def generate_bearer_key():
-    "using client and secret key generate the xray bearer key and use it"
+    """
+    Assuming there is need to generate a Key may ve bearer key 
+    using client id and secretkey
+    using client and secret key generate the bearer key and use it
+    """
 
-    #url to create token for google auth - if its not same always/
-    url = ".../authenticate"
+    #url to create token for google auth - if its not same always then call this method to generate this
+    url = "http://.../authenticate"
     payload = json.dumps({
             "client_id": "",
             "client_secret": ""
@@ -42,7 +46,7 @@ def generate_bearer_key():
     'Content-Type': 'application/json'
     }
     response = requests.request("POST", url, headers=headers, data=payload)
-    new_reponse = response.text.replace('"','')
+    new_reponse = response.text
 
     return new_reponse
 
@@ -50,6 +54,7 @@ def generate_bearer_key():
 def post_to_newsletter(final_url):
     "Method to call the newsletter API and post the url"
     
+    #generate authkey everytime for the request if not static value
     APP_AUTH = 'Bearer {}'.format(generate_bearer_key())
 
     headers = {
@@ -58,7 +63,7 @@ def post_to_newsletter(final_url):
         }
 
     #newsletter app url currently using my own newsletter ec2 setup
-    app_url= "http://3.141.195.167:5000/articles"
+    app_url= "http://...:5000/articles"
     payload=payload={'url': final_url,
         'category_id': '2',
         'description': 'Adding Description through API',
@@ -70,19 +75,28 @@ def post_to_newsletter(final_url):
     return response.status_code
 
 def lambda_handler(event, context):
+    """
+    Method run when Lambda is triggered
+    calls the filtering logic
+    calls the logic to post to endpoint
+    """
     content = get_message_contents(event)
     message = content['msg']
     channel = content['chat_id']
     user = content['user_id']
     print(f'{message}, {user}, {channel}')
+    
     response=""
     final_url=""
     if channel == os.environ.get('ETC_CHANNEL') and user != os.environ.get('Qxf2Bot_USER'):
         print("Getting message posted on ETC ")
         cleaned_message = clean_message(message)
         final_url=get_url(cleaned_message)
+        #Filtered URL is printed by lambda
         print("Final url is :",final_url)
         if final_url:
+            #till we get correct endpoint details next line will throw error
+            #it worked with my ec2 instance of newsletter which didnt have auth code
             response = post_to_newsletter(final_url)
         else:
             print("message does not contain any url")
