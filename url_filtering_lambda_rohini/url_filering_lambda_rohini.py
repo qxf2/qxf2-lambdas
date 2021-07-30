@@ -52,12 +52,20 @@ def post_to_newsletter(final_url):
     
     APP_AUTH = 'Bearer {}'.format(generate_bearer_key())
 
-    headers = {'Content-Type': 'application/json','Authorization': APP_AUTH}
-    #newsletter app url
-    app_url= "http://localhost:5000"
-    payload={}
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': APP_AUTH
+        }
+
+    #newsletter app url currently using my own newsletter ec2 setup
+    app_url= "http://3.141.195.167:5000/articles"
+    payload=payload={'url': final_url,
+        'category_id': '2',
+        'description': 'Adding Description through API',
+        'title': 'Adding title through API',
+        'time': '5'}
     payloadJson = json.dumps(payload)
-    response = requests.request("POST", app_url, headers=headers, data=payloadJson)
+    response = response = requests.request("POST", app_url, headers=headers, data=payload)
     print(response.status_code)
     return response.status_code
 
