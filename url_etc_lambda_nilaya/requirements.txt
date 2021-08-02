@@ -1,2 +1,3 @@
 requests==2.24.0
 boto3==1.14.43
+urlextract==1.3.0
