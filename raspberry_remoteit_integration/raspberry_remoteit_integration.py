@@ -8,6 +8,7 @@ import json
 import requests
 import paramiko
 import credentials as credentials
+from multiprocessing import Pipe, Process
 
 developerkey = credentials.developerkey
 
@@ -70,47 +71,60 @@ def get_device_hostport_list():
     return server_list
 
 
-def run_command_in_pi():
+def run_command_in_pi(proxy_data, conn):
     "Connects to each device and runs a python file"
-    proxy_data_list = get_device_hostport_list()
-    i = 0
     file_to_copy = "call_out_to_colleagues.py"
-    for proxy_data in proxy_data_list:
-        proxy_port = proxy_data["proxy_port"]
-        proxy_server = proxy_data["proxy_server"]
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    proxy_port = proxy_data["proxy_port"]
+    proxy_server = proxy_data["proxy_server"]
+    try:
+        ssh.connect(
+            proxy_server,
+            username=credentials.proxy_username,
+            password=credentials.proxy_password,
+            port=proxy_port,
+            banner_timeout=60,
+        )
+
+        sftp = ssh.open_sftp()
         try:
-            ssh.connect(
-                proxy_server,
-                username=credentials.proxy_username,
-                password=credentials.proxy_password,
-                port=proxy_port,
-                banner_timeout=200,
-            )
-
-            sftp = ssh.open_sftp()
-            try:
-                sftp.stat("/home/pi/" + file_to_copy)
-                print("file exists")
-            except Exception as exception:
-                sftp.put(file_to_copy, "/home/pi/" + file_to_copy)
-                print("Copied file")
-
-            lines = []
-            ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(
-                "python call_out_to_colleagues.py"
-            )
-            lines.append(ssh_stdout.readlines())
-            lines.append(ssh_stderr.readlines())
-            print("Output from device " + str(i) + " is: \n" + str(lines) + "\n")
-
+            sftp.stat("/home/pi/" + file_to_copy)
+            print("file exists")
         except Exception as exception:
-            print(exception)
-        i = i + 1
+            sftp.put(file_to_copy, "/home/pi/" + file_to_copy)
+            print("Copied file")
+
+        lines = []
+        ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(
+            "python call_out_to_colleagues.py"
+        )
+        lines.append(ssh_stdout.readlines())
+        lines.append(ssh_stderr.readlines())
+        print("Output from device " + proxy_server + " is: \n" + str(lines) + "\n")
+
+    except Exception as exception:
+        print(exception)
+    conn.close()
 
 
 if __name__ == "__main__":
     # def run_command_in_pi(event, context):
     "lambda entry point"
-    run_command_in_pi()
+    parent_connections = []
+    # create a list to keep all processes
+    processes = []
+    proxy_data_list = get_device_hostport_list()
+    for proxy_data in proxy_data_list:
+        # create a pipe for communication
+        parent_conn, child_conn = Pipe()
+        parent_connections.append(parent_conn)
+        # create the process, pass instance and connection
+        process = Process(target=run_command_in_pi, args=(proxy_data, child_conn,))
+        processes.append(process)
+    for process in processes:
+        process.start()
+    # make sure that all processes have finished
+    for process in processes:
+        process.join()
