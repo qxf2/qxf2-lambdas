@@ -16,7 +16,7 @@ jobs:
       with:
         lambda_directory: 'url_etc_lambda_nilaya'
         lambda_function_name: 'arn:aws:lambda:ap-south-1:285993504765:function:Url_Filtering_Nilaya_lambda'
-        lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:requests-boto'
+        lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:nilaya_layer:1'
         requirements_txt: 'url_etc_lambda_nilaya/requirements.txt'
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

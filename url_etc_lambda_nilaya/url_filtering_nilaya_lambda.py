@@ -8,8 +8,6 @@ import requests
 import re
 from urlextract import URLExtract
 
-QUEUE_URL = 'https://sqs.ap-south-1.amazonaws.com/285993504765/skype-listener'
-
 def clean_message(message):
     "Clean up the message received"
     message = message.replace("'", '-')
@@ -28,12 +26,18 @@ def get_message_contents(event):
 
 def url_filter(message):
     "Get the message from etc channel and filter only urls"
-    filter_url = URLExtract()
-    url = extractor.filter_urls(message)
+    extractor = URLExtract()
+    url = extractor.find_urls(message)
     print(url)
-    print(urls[0])
+    print(url[0])
 
-    return (urls[0])
+    return (url[0])
+
+def fetch_env_variables():
+    "Get the environment variables"
+    channel = os.environ.get('ETC_CHANNEL')
+
+    return channel
 
 def lambda_handler(event, context):
     "Lambda processing message from etc and passing url to api for newsletter"
@@ -41,17 +45,17 @@ def lambda_handler(event, context):
     message = message_contents['msg']
     channel = message_contents['chat_id']
     user = message_contents['user_id']
+    response=""
+    filtered_url=""
+    '''
     if channel == os.environ.get('QUEUE_URL') and user != os.environ.get('Qxf2Bot_USER'):
-        cleaned_message = clean_message(message)
-        filtered_url=url_filter(cleaned_message)
-        if filtered_url:
-            response = requests.post('api for newsletter', data = filtered_url)
-        else:
-            print("No url found")
+    '''
+    cleaned_message = clean_message(message)
+    filtered_url=url_filter(cleaned_message)
+    if filtered_url:
+        '''
+        response = requests.post('api for newsletter', data = filtered_url)
+        '''
+        print(response)
     else:
-        print("Message not from ETC channel")
-
-    return {
-        'statusCode': response,
-        'body': json.dumps(filtered_url)
-    }
+        print("No url found")
