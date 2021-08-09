@@ -181,3 +181,4 @@ def trigger_notifications(event, context):
     "lambda entry point"
     trigger_command = event['msg']
     run_in_parallel(trigger_command)
+    
