@@ -1,8 +1,7 @@
-name: raspberry-notifier
+name: deploy-raspberry-notifier
 on:
   push:
-    branches:
-      - master
+    branches: [master, send_notifications_using_raspberry]
     paths:
       - 'raspberry_notifier/**'
 jobs:
