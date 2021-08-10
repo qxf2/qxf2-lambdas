@@ -28,7 +28,7 @@ def get_url(message):
     regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
     url = re.findall(regex,message)
 
-    return [x[0] for x in url if x[-1]!='-']
+    return [x[0] for x in url if x[0][-1]!='-']
 
 def post_to_newsletter(final_url, category_id = '2'):
     "Method to call the newsletter API and post the url"
