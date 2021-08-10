@@ -2,7 +2,7 @@ name: url-filtering-lambda-rohini
 on:
   push:
     branches:
-      - rohini_lambda_work
+      - master
     paths:
       - 'url_filtering_lambda_rohini/**'
       - '.github/workflows/url_filtering_lambda_rohini.yml'
