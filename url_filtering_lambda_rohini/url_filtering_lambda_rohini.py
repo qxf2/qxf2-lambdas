@@ -20,58 +20,24 @@ def get_message_contents(event):
     message = record.get('body')
     message = json.loads(message)['Message']
     message = json.loads(message)
-    
+
     return message
 
 def get_url(message):
     "Get the URL from the message"
     regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
-    url = re.findall(regex,message)      
+    url = re.findall(regex,message)
     return [x[0] for x in url]
 
-def generate_bearer_key():
-    """
-    Assuming there is need to generate a Key may ve bearer key 
-    using client id and secretkey
-    using client and secret key generate the bearer key and use it
-    """
-
-    #url to create token for google auth - if its not same always then call this method to generate this
-    url = "http://.../authenticate"
-    payload = json.dumps({
-            "client_id": "",
-            "client_secret": ""
-            })
-    headers = {
-    'Content-Type': 'application/json'
-    }
-    response = requests.request("POST", url, headers=headers, data=payload)
-    new_reponse = response.text
-
-    return new_reponse
-
-
-def post_to_newsletter(final_url):
+def post_to_newsletter(final_url, category_id = '2'):
     "Method to call the newsletter API and post the url"
-    
-    #generate authkey everytime for the request if not static value
-    APP_AUTH = 'Bearer {}'.format(generate_bearer_key())
 
-    headers = {
-        'Content-Type': 'application/json',
-        'Authorization': APP_AUTH
-        }
-
-    #newsletter app url currently using my own newsletter ec2 setup
-    app_url= "http://...:5000/articles"
-    payload=payload={'url': final_url,
-        'category_id': '2',
-        'description': 'Adding Description through API',
-        'title': 'Adding title through API',
-        'time': '5'}
-    payloadJson = json.dumps(payload)
-    response = response = requests.request("POST", app_url, headers=headers, data=payload)
-    print(response.status_code)
+    url = os.environ.get('URL', '')
+    headers = {'x-api-key' : os.environ.get('API_KEY_VALUE','')}
+    for article_url in final_url:
+        data = {'url': article_url, 'category_id': category_id}
+        response = requests.post(url, data = data, headers = headers)
+        print(response.status_code)
     return response.status_code
 
 def lambda_handler(event, context):
@@ -85,7 +51,7 @@ def lambda_handler(event, context):
     channel = content['chat_id']
     user = content['user_id']
     print(f'{message}, {user}, {channel}')
-    
+
     response=""
     final_url=""
     if channel == os.environ.get('ETC_CHANNEL') and user != os.environ.get('Qxf2Bot_USER'):
@@ -107,4 +73,4 @@ def lambda_handler(event, context):
         'statusCode': response,
         'body': json.dumps(final_url)
     }
-    
+
