@@ -1,6 +1,6 @@
 """
-Lambda to connect to raspberry pi using remoteit. All devices must be registered with
-remoteit account. It will connect to all online devices and play out an audio message.
+Lambda to connect to raspberry pi using remote.it. All devices must be registered with
+remote.it account. It will connect to all online devices and play out an audio message.
 """
 
 import json
@@ -15,7 +15,7 @@ import credentials
 DEVELOPER_KEY = credentials.DEVELOPER_KEY
 
 def login():
-    "Logs in to the provided remoteit account"
+    "Logs in to the provided remote.it account"
     login_url = "https://api.remot3.it/apv/v27/user/login"
     payload = {
         "username":credentials.USERNAME,
@@ -31,12 +31,12 @@ def login():
             print("Unable to login, error: ", login_data["reason"])
             sys.exit(1)
     except Exception as error:
-        print("Error while trying to login to remoteit", error)
+        print("Error while trying to login to remote.it", error)
         raise SystemExit(error)
     return token
 
 def list_devices(token):
-    "Returns the list of online devices in remoteit"
+    "Returns the list of online devices in remote.it"
     listing_url = "https://api.remot3.it/apv/v27/device/list/all"
     headers = {
         "developerkey": DEVELOPER_KEY,
@@ -72,7 +72,6 @@ def connect_and_run(token, command, device_address, device_alias, conn):
     "Creates a proxy connection to the device, gets details of host and port and runs command"
     time_now = time.time()
     connect_url = "https://api.remot3.it/apv/v27/device/connect"
-    payload = {}
     payload = {
         "deviceaddress": device_address,
         "wait":"true",
