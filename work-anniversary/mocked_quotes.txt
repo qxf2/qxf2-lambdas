@@ -1,0 +1,12 @@
+{
+    "1st": ["Congratulations on your one year of work experience!"],
+    "experienced": [
+        "You are an asset to our company, and I hope you’ll continue on this path of hard work."
+    ],
+    "Rohini Gopal": [
+        "From all of us… happy anniversary! Thank you for your hard work, your generosity, and your contagious enthusiasm."
+    ],
+    "Sravanti Tatiraju": [],
+    "Drishya TM": ["Happy work anniversary to an always fun and smiling colleague"],
+    "Preedhi Vivek": []
+}
