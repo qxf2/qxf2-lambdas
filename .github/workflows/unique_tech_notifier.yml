@@ -2,7 +2,7 @@ name: deploy-unique-tech-notifier
 on:
   push:
     branches:
-      - unique-tech-lambda
+      - master
     paths:
       - 'unique_tech_notifier/**'
 jobs:
