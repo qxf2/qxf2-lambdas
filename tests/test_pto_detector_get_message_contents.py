@@ -1,5 +1,5 @@
 """
-Unit tests for get_message_contents method pf pto_detector lambda
+Code level tests for get_message_contents method pf pto_detector lambda
 """
 import ast
 import collections
@@ -62,7 +62,7 @@ class TestWriteMessage(object):
 
     def test_pto_detector_get_message_contents(self):
         """
-        Unit test for pto_detctor
+        Code level test for pto_detctor
         """
         event = self.extract_event_from_event_string()
         actual_message = pto_detector.get_message_contents(event)
