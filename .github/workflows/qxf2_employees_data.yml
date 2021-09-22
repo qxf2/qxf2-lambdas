@@ -2,7 +2,7 @@ name: deploy-qxf2-employees-data-lambda
 on:
   push:
     branches:
-      - employees-lambda
+      - master
     paths:
       - 'qxf2_employees_data/**'
 jobs:

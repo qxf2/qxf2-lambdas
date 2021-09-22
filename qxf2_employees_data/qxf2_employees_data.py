@@ -31,6 +31,7 @@ def get_all_employees():
                     firstname
                     lastname
                     dateJoined
+                    skypeId
                     isActive
                 }
             }
