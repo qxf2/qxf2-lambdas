@@ -6,6 +6,8 @@ import os
 import boto3
 import requests
 import re
+from urlextract import URLExtract
+
 
 def clean_message(message):
     "Clean up the message received"
@@ -25,10 +27,20 @@ def get_message_contents(event):
 
 def get_url(message):
     "Get the URL from the message"
+    """
     regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
     url = re.findall(regex,message)
 
     return [x[0] for x in url if x[0][-1]!='-']
+    """
+    extractor = URLExtract()
+    urls = extractor.find_urls(message)
+    print(urls)
+    if urls:
+        return (urls[0])
+    else: 
+        return
+    
 
 
 def lambda_handler(event, context):
