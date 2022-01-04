@@ -132,7 +132,7 @@ class ptodetectortest():
 
     return logstream
 
-class ptodetectornonptotest(unittest.TestCase):
+class TestPtoDetectorNonPtotest():
   """
   Test class
   """
