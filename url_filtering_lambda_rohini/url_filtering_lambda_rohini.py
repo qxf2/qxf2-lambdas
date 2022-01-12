@@ -7,6 +7,8 @@ import boto3
 import requests
 import re
 
+EXCLUDE_URL_STRINGS = ['skype.com', 'meet.google.com', 'trello.com/b/']
+
 def clean_message(message):
     "Clean up the message received"
     message = message.replace("'", '-')
@@ -26,9 +28,19 @@ def get_message_contents(event):
 def get_url(message):
     "Get the URL from the message"
     regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
-    url = re.findall(regex,message)
+    url_patterns = re.findall(regex,message)
+    urls = []
+    for url in url_patterns:
+        if url[0][-1] != '-':
+            present_flag = False
+            for exclude_url in EXCLUDE_URL_STRINGS:
+                if exclude_url in url[0]:
+                    present_flag = True
+                    break
+            if not present_flag:
+                urls.append(url[0])
 
-    return [x[0] for x in url if x[0][-1]!='-']
+    return urls
 
 def post_to_newsletter(final_url, category_id = '2'):
     "Method to call the newsletter API and post the url"
@@ -54,7 +66,7 @@ def lambda_handler(event, context):
     print(f'{message}, {user}, {channel}')
 
     response=""
-    final_url=""
+    final_url=[]
     if channel == os.environ.get('ETC_CHANNEL') and user != os.environ.get('Qxf2Bot_USER'):
         print("Getting message posted on ETC ")
         cleaned_message = clean_message(message)
@@ -62,8 +74,6 @@ def lambda_handler(event, context):
         #Filtered URL is printed by lambda
         print("Final url is :",final_url)
         if final_url:
-            #till we get correct endpoint details next line will throw error
-            #it worked with my ec2 instance of newsletter which didnt have auth code
             response = post_to_newsletter(final_url)
         else:
             print("message does not contain any url")
