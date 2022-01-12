@@ -91,9 +91,7 @@ def test_multiple_url_post(mock_post, sentence, expected):
     mock_response = mock.MagicMock()
     mock_response.status_code = test_status_code
     mock_post.return_value = mock_response
-    if len(expected):
-        result = url_filter.post_to_newsletter(expected)
+    result = url_filter.post_to_newsletter(expected)
 
-        assert result == test_status_code
-        assert mock_post.call_count == len(expected)
-
+    assert result == test_status_code
+    assert mock_post.call_count == len(expected)
