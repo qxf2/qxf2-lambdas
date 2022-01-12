@@ -7,7 +7,7 @@ import boto3
 import requests
 import re
 
-EXCLUDE_URL_STRINGS = ['skype.com', 'meet.google.com', 'trello.com/b/']
+EXCLUDE_URL_STRINGS = ['skype.com', 'meet.google.com', 'trello.com/b']
 
 def clean_message(message):
     "Clean up the message received"
