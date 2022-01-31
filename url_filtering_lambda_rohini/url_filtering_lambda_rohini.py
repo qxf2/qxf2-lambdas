@@ -47,11 +47,14 @@ def post_to_newsletter(final_url, category_id = '2'):
 
     url = os.environ.get('URL', '')
     headers = {'x-api-key' : os.environ.get('API_KEY_VALUE','')}
-    for article_url in final_url:
-        data = {'url': article_url, 'category_id': category_id}
-        response = requests.post(url, data = data, headers = headers)
-        print(response.status_code)
-    return response.status_code
+    response_status = ""
+    if len(final_url) != 0:
+        for article_url in final_url:
+            data = {'url': article_url, 'category_id': category_id}
+            response = requests.post(url, data = data, headers = headers)
+            response_status = response.status_code
+            print(response_status)
+    return response_status          
 
 def lambda_handler(event, context):
     """
