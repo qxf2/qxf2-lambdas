@@ -4,6 +4,7 @@ Lambda to update neo4j database with respect to graphql data
 import json
 import requests
 from urllib.parse import urljoin
+import os
 
 API_KEY = os.environ.get('API_KEY')
 URL = os.environ.get('URL')
@@ -32,9 +33,10 @@ def add_new_employee(employee):
 
 def lambda_handler(event, context):
     "Method run when Lambda is triggered"
-      
+
     graphql_employees = get_employees_graphql()
-       
+    add_status = "No new employees to add"
+        
     for employee in graphql_employees:
         employee_email = {"email":employee['email']}
         employee_email = json.dumps(employee_email)
@@ -42,11 +44,8 @@ def lambda_handler(event, context):
         if employee_details == "Employee does not exist" and employee['email'] != "test@qxf2.com":
             add_employee = add_new_employee(employee)
             if add_employee.status_code == 200:
-                print("Successfully added new employee",employee['fullName'])
+                add_status = "Successfully added new employee %s"%employee['fullName']
             else:
-                print("Failed to add new employee")
+                add_status = "Failed to add new employee"
+    return add_status
         
-    
-            
-    
-    
