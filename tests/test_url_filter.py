@@ -15,6 +15,8 @@ Tests for the URL filtering lambda
     - single url
     - multiple url
 """
+
+
 import json
 import os
 import pytest
@@ -25,6 +27,7 @@ from unittest.mock import patch
 TEST_DATA = [("This is a URL: https://qxf2.com",["https://qxf2.com"]),
             ("This is NOT a URL http:/qxf2.com",[]),
             ("Message with multiple urls https://qxf2.com and https://chessbase.com", ["https://qxf2.com", "https://chessbase.com"])]
+
 
 @pytest.mark.parametrize("sentence,expected", TEST_DATA)
 def test_get_url(sentence, expected):
@@ -87,13 +90,13 @@ def test_qxf2_bot_user(mock_message_contents):
 @patch('requests.post')
 def test_multiple_url_post(mock_post, sentence, expected):
     "Verify that post_to_newsletter is called the correct number of times"
-    test_status_code = 'Via test!'
+    if expected == []:
+        test_status_code = ""
+    else:
+        test_status_code = 'Via test!'
     mock_response = mock.MagicMock()
     mock_response.status_code = test_status_code
     mock_post.return_value = mock_response
-    if len(expected):
-        result = url_filter.post_to_newsletter(expected)
-
-        assert result == test_status_code
-        assert mock_post.call_count == len(expected)
-
+    result = url_filter.post_to_newsletter(expected)
+    assert result == test_status_code
+    assert mock_post.call_count == len(expected)
