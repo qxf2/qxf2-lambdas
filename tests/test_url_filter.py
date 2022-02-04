@@ -100,3 +100,25 @@ def test_multiple_url_post(mock_post, sentence, expected):
     result = url_filter.post_to_newsletter(expected)
     assert result == test_status_code
     assert mock_post.call_count == len(expected)
+
+@patch('requests.post')
+def test_post_multiple(mock_post):
+    "Verify if post_to_newsletter returns accurate response if one or more URLs in a list of multiple URLs fail to be posted"
+    multiple_url_list = ["https://qxf2.com", "https://skype.com"]
+    success_status_code = 'Posted Successfully'
+    failure_status_code = "Failed to post"
+
+    #mock response for successfull post 
+    mock_response_success = mock.MagicMock()
+    mock_response_success.status_code = success_status_code
+
+    #mock response for unsuccessfull post
+    mock_response_failure = mock.MagicMock()
+    mock_response_failure.status_code = failure_status_code
+
+    #mock the first post to fail and second post to pass
+    mock_post.side_effect = [mock_response_failure,mock_response_success]
+
+    result = url_filter.post_to_newsletter(multiple_url_list)
+    assert result == failure_status_code
+    assert mock_post.call_count == len(multiple_url_list)
