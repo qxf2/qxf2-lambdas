@@ -120,5 +120,5 @@ def test_post_multiple(mock_post):
     mock_post.side_effect = [mock_response_failure,mock_response_success]
 
     result = url_filter.post_to_newsletter(multiple_url_list)
-    assert result == failure_status_code
-    assert mock_post.call_count == len(multiple_url_list)
+    assert result == failure_status_code,"Expected post_to_newsletter to return failed response but it did not"
+    assert mock_post.call_count == len(multiple_url_list),f"Expected exactly {len(multiple_url_list)} calls to post to newsletter but got {mock_post.call_count}"
