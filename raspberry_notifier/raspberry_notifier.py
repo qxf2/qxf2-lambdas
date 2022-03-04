@@ -11,6 +11,7 @@ from multiprocessing import Pipe, Process
 import requests
 import paramiko
 import credentials
+import skype_config as config
 
 DEVELOPER_KEY = credentials.DEVELOPER_KEY
 
@@ -53,12 +54,12 @@ def list_devices(token):
         ip_alias_map = {}
         for device in device_data:
             if device["servicetitle"] == "Bulk Service":
-                ip_alias_map[device["devicelastip"]] = device["devicealias"]
+                ip_alias_map[device["devicelastip"].split(":")[0]] = device["devicealias"]
         for device in device_data:
             if device["servicetitle"] == "SSH" and device["devicestate"] == "active":
                 device_address = device["deviceaddress"]
                 device_address_alias_map[device_address] = ip_alias_map[
-                    device["devicelastip"]
+                    device["devicelastip"].split(":")[0]
                 ]
         if len(device_address_alias_map) == 0:
             print("No devices online")
@@ -155,6 +156,19 @@ def run_sftp(ssh, file_to_copy):
         sftp.put(file_to_copy, "/home/pi/" + file_to_copy)
         print("Copied the file")
 
+def send_skype_message(message):
+    headers = {
+        'Content-Type': 'application/json',
+    }
+    data = {}
+    data["msg"] = message
+    data["channel"] = config.SKYPE_CHANNEL
+    data["API_KEY"] = config.API_KEY
+
+    response = requests.post(config.SKYPE_URL, headers=headers, data=json.dumps(data))
+
+    print(response.status_code)   
+
 def run_in_parallel(command):
     "Makes connections to different devices in parallel"
     parent_connections = []
@@ -179,5 +193,8 @@ def run_in_parallel(command):
 def trigger_notifications(event, context):
     "lambda entry point"
     trigger_command = event['msg']
+   
     run_in_parallel(trigger_command)
-    
+    if "Please join" in trigger_command:
+        trigger_command = trigger_command + "https://buzz-my-colleagues.qxf2.com/test"
+        send_skype_message(trigger_command)
