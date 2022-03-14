@@ -42,7 +42,7 @@ def get_url(message):
 
     return urls
 
-def post_to_newsletter(final_url, category_id = '2'):
+def post_to_newsletter(final_url, category_id = '5'):
     "Method to call the newsletter API and post the url"
 
     url = os.environ.get('URL', '')
