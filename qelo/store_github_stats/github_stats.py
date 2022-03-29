@@ -1,5 +1,5 @@
 """
-Collect and store GitHub stats for all Qxf2 repositories
+Collect and store the GitHub stats for all Qxf2 repositories
  - DynamoDB table format being:
    date, repo_name, stars, forks, clones, visitors
 This script is meant to be run daily at 11pm UST (ie 4.30am IST)
