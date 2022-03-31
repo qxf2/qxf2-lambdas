@@ -1,8 +1,8 @@
 """
-Collect and store the GitHub stats for all Qxf2 repositories.
+Collect and store the GitHub stats for all Qxf2 repositories
  - DynamoDB table format being:
-   date, repo_name, stars, forks, clones, visitors.
-This script is meant to be run everyday.
+   date, repo_name, stars, forks, clones, visitors
+This script is meant to be run daily at 11pm UST (ie 4.30am IST)
 """
 from datetime import datetime
 import os
@@ -51,7 +51,7 @@ def prepare_stats(date, repos):
     return stats
 
 def lambda_handler(event, context):
-    "Lambda entry point"
+    "Entry point for Lambda execution"
     for retry_count in range(int(os.environ["RETRIES_COUNT"])):
         try:
             print(f'Retry attempt : {retry_count}')
