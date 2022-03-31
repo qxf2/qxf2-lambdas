@@ -39,6 +39,13 @@ def set_employee_status(employee_status_data):
     update_status = requests.post(update_status_url, data=employee_status_data, headers={"User":API_KEY}).json()
     return update_status
 
+def employee_add_status(add_employee,employee):
+    if add_employee.status_code == 200:
+        add_status = "Successfully added new employee %s"%employee
+    else:
+        add_status = "Failed to add new employee"
+    return add_status
+
 def lambda_handler(event, context):
     "Method run when Lambda is triggered"
       
@@ -52,10 +59,7 @@ def lambda_handler(event, context):
 
         if employee_details == "Employee does not exist" and employee['email'] != os.environ.get('EMAIL'):
             add_employee = add_new_employee(employee)
-            if add_employee.status_code == 200:
-                add_status = "Successfully added new employee %s"%employee['fullName']
-            else:
-                add_status = "Failed to add new employee"
+            add_status = employee_add_status(add_employee, employee['fullName'])
 
         if employee_details != "Employee does not exist":
             if employee_details[0]['employee_details']['status'] != employee['status']:
