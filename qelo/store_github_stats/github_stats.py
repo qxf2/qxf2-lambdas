@@ -51,7 +51,7 @@ def prepare_stats(date, repos):
     return stats
 
 def lambda_handler(event, context):
-    "Lambda entry point"
+    "Entry point for Lambda execution"
     for retry_count in range(int(os.environ["RETRIES_COUNT"])):
         try:
             print(f'Retry attempt : {retry_count}')
