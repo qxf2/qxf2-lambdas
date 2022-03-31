@@ -1,8 +1,8 @@
-name: deploy-store-github-stats
+name: deploy-github-stats
 on:
   push:
     branches:
-      - 'github_stats_refactor'
+      - master
     paths:
       - 'qelo/store_github_stats/**'
 jobs:
