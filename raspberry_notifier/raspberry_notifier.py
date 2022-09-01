@@ -123,9 +123,16 @@ def run_command_in_pi(command, proxy_data, conn):
             port=proxy_port,
             banner_timeout=20,
         )
-        ssh_command = (
-            "espeak -ven-us+f3 -s 125 --stdout '" + command + "' | aplay 2>/dev/null"
-        )
+        if "buddy" in command:
+            run_sftp(ssh, "voiceDavid.mp3")
+            ssh_command = (
+                "aplay /home/pi/voiceDavid.mp3"
+            )
+        else:
+            ssh_command = (
+                "espeak -ven-us+f3 -s 125 --stdout '" + command + "' | aplay 2>/dev/null"
+            )
+
         ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(ssh_command)
         print(
             "\nTime taken to ssh and run espeak for : "
@@ -195,6 +202,6 @@ def trigger_notifications(event, context):
     trigger_command = event['msg']
    
     run_in_parallel(trigger_command)
-    if "Please join" in trigger_command:
-        trigger_command = trigger_command + "https://buzz-my-colleagues.qxf2.com/test"
+    if "buddy" in trigger_command:
+        trigger_command = trigger_command + "https://water-cooler-talks.qxf2.com/water-cooler-talks"
         send_skype_message(trigger_command)
