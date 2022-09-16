@@ -124,9 +124,9 @@ def run_command_in_pi(command, proxy_data, conn):
             banner_timeout=20,
         )
         if "buddy" in command:
-            run_sftp(ssh, "voiceDavid.mp3")
+            run_sftp(ssh, "voiceDavid.wav")
             ssh_command = (
-                "aplay /home/pi/voiceDavid.mp3"
+                "aplay /home/pi/voiceDavid.wav"
             )
         else:
             ssh_command = (
