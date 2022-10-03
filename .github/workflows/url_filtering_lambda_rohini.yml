@@ -12,6 +12,7 @@ jobs:
     if: contains(github.event.ref, '-sprint-')
     environment:
       name: staging-url-filter
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
     - name: Deploy code to Lambda
