@@ -3,11 +3,15 @@ Lambda to to pull URL from ETC channel messages
 """
 import json
 import os
+import re
+import random
 import boto3
 import requests
-import re
+import validators
 
 EXCLUDE_URL_STRINGS = ['skype.com', 'meet.google.com', 'trello.com/b']
+QUEUE_URL = 'https://sqs.ap-south-1.amazonaws.com/285993504765/skype-sender'
+
 
 def clean_message(message):
     "Clean up the message received"
@@ -37,21 +41,48 @@ def get_url(message):
                 if exclude_url in url[0]:
                     present_flag = True
                     break
-            if not present_flag:
+            if not present_flag and validators.url(url[0]):
                 urls.append(url[0])
 
     return urls
 
-def post_to_newsletter(final_url, category_id = '5'):
+def post_to_newsletter(final_url, article_editor, category_id = '2'):
     "Method to call the newsletter API and post the url"
-
     url = os.environ.get('URL', '')
     headers = {'x-api-key' : os.environ.get('API_KEY_VALUE','')}
     for article_url in final_url:
-        data = {'url': article_url, 'category_id': category_id}
+        data = {'url': article_url, 'category_id': category_id, 'article_editor': article_editor}
         response = requests.post(url, data = data, headers = headers)
         print(response.status_code)
     return response.status_code
+
+def pick_random_user(article_editors_list):
+    "Return a random employee to edit the article"
+    tmp = article_editors_list[:]
+    result = [tmp.pop(random.randrange(len(tmp))) for _ in range(1)]
+    listToStr = ' '.join(map(str, result))
+
+    return listToStr
+
+def get_article_editor(employee_list):
+    "Return a list of primary comment reviewers"
+    return os.environ.get(employee_list,"").split(',')
+
+def write_message(message, channel):
+    "Send a message to Skype Sender"
+    sqs = boto3.client('sqs')
+    print(channel)
+    message = str({'msg':f'{message}', 'channel':channel})
+    print(message)
+    sqs.send_message(QueueUrl=QUEUE_URL, MessageBody=(message))
+
+def get_reply():
+    "Get the Employee to edit the article for newsletter"
+    article_editors_list = get_article_editor('employee_list')
+    article_editor = pick_random_user(article_editors_list)
+    reply = f'Article editor: {article_editor}'
+
+    return reply,article_editor
 
 def lambda_handler(event, context):
     """
@@ -74,7 +105,9 @@ def lambda_handler(event, context):
         #Filtered URL is printed by lambda
         print("Final url is :",final_url)
         if final_url:
-            response = post_to_newsletter(final_url)
+            reply,article_editor = get_reply()
+            response = post_to_newsletter(final_url, article_editor)
+            write_message(reply, os.environ.get('ETC_CHANNEL',''))
         else:
             print("message does not contain any url")
     else:
@@ -84,4 +117,3 @@ def lambda_handler(event, context):
         'statusCode': response,
         'body': json.dumps(final_url)
     }
-
