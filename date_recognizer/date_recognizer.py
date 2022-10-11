@@ -38,6 +38,8 @@ def extract_date(event: object,
     state = Status.fail
     extracted_date=None
 
+    # Get the querystring passed with the URI
+    text = event['queryStringParameters'].get('text')
     try:
         # Extract date from text
         date_list = list(find_dates(text))
