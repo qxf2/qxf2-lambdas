@@ -4,7 +4,7 @@ Extracts date from provided text
 
 import sys
 import datetime
-import lexnlp.extract.en.dates as lexnlp
+from datefinder import find_dates
 from enum import Enum
 
 
@@ -18,8 +18,7 @@ class Status(Enum):
 
 
 def extract_date(event: object,
-                 context: object,
-                 text: str):
+                 context: object):
     """
     Extracts the date from the provided text
     :param event: data for lambda function to process
@@ -29,6 +28,7 @@ def extract_date(event: object,
     :return: response with status code, date, text
     """
     # Set defaults
+    text = None
     response = {'statusCode': None,
                 'headers': {'Content-Type': 'application/json'},
                 'body': {'date': None, 'text':text}
@@ -40,7 +40,7 @@ def extract_date(event: object,
 
     try:
         # Extract date from text
-        date_list = list(lexnlp.get_dates(text))
+        date_list = list(find_dates(text))
 
         # If date not extracted, check if today/tomorrow present in text
         if len(date_list) == 0:
