@@ -133,3 +133,7 @@ dmypy.json
 
 # Lambda config
 *config.yaml*
+
+#Generated cargo files
+/target/
+Cargo.lock
