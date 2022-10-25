@@ -1,2 +1,1 @@
-regex==2019.11.1
 datefinder
