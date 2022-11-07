@@ -41,7 +41,7 @@ def get_message_contents(event):
 
     return message
 
-def invoke_lambda(lambda_func,type,payload='{}''):
+def invoke_lambda(lambda_func,type,payload='{}'):
     'to invoke aws lambda'
     lambdaClient = boto3.client('lambda')
     response = lambdaClient.invoke(FunctionName=lambda_func, 
