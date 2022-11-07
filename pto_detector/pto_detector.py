@@ -65,18 +65,23 @@ def lambda_handler(event, context):
     if is_pto_flag and user != os.environ.get('Qxf2Bot_USER'):
         message_to_send = f'Detected PTO message {cleaned_message}'
         write_message(message_to_send, os.environ.get('SEND_CHANNEL'))
-    if is_pto_flag == True:
-        invoke_type = 'RequestResponse'
-        try:
-            classifier_response = invoke_lambda(EVENT_CLASSIFIER_LAMBDA,invoke_type,message)
-            classifier_payload = json.loads(classifier_response['Payload'].read())
-            if classifier_payload.get('statusCode')==200:
-                pto_date = classifier_payload.get('body')
-                write_message(f'Detected PTO dates are {pto_date}', os.environ.get('SEND_CHANNEL'))
-                calendar_event_response = invoke_lambda(CALENDAR_EVENT_LAMBDA,invoke_type,pto_date)
-                calendar_event_payload = json.loads(calendar_event_response['Payload'].read())
-                if calendar_event_payload.get('statusCode')==200 and if calendar_event_payload.get('body') == "calendar event created":
-                   write_message(f'calendar event successfully created', os.environ.get('SEND_CHANNEL'))               
-        except Exception as error:
-            print(error)
-            raise Exception('Experiencing issues with Event Classifier Lambda / Calendar Event Lambda') from error
+        if os.environ.get(EVENT_CLASSIFIER_LAMBDA):
+            invoke_type = 'RequestResponse'
+            try:
+                classifier_response = invoke_lambda(EVENT_CLASSIFIER_LAMBDA,invoke_type,message)
+                classifier_payload = json.loads(classifier_response['Payload'].read())
+                if classifier_payload.get('statusCode')==200:
+                    pto_date = classifier_payload.get('body')
+                    write_message(f'Detected PTO dates are {pto_date}', os.environ.get('SEND_CHANNEL'))
+                    if os.environ.get(CALENDAR_EVENT_LAMBDA):
+                        calendar_event_response = invoke_lambda(CALENDAR_EVENT_LAMBDA,invoke_type,pto_date)
+                        calendar_event_payload = json.loads(calendar_event_response['Payload'].read())
+                        if calendar_event_payload.get('statusCode')==200 and calendar_event_payload.get('body') == "calendar event created":
+                            write_message(f'calendar event successfully created', os.environ.get('SEND_CHANNEL'))  
+                    else:
+                        write_message("CALENDER EVENT LAMBDA is not configured", os.environ.get('SEND_CHANNEL'))           
+            except Exception as error:
+                print(error)
+                raise Exception('Experiencing issues with invoking Event Classifier Lambda / Calendar Event Lambda') from error
+        else:
+            write_message("EVENT CLASSIFIER LAMBDA is not configured", os.environ.get('SEND_CHANNEL'))
