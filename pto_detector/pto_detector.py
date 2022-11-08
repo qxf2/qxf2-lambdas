@@ -9,8 +9,8 @@ import boto3
 import requests
 IS_PTO_URL = 'https://practice-testing-ai-ml.qxf2.com/is-pto'
 QUEUE_URL = 'https://sqs.ap-south-1.amazonaws.com/285993504765/skype-sender'
-CALENDAR_EVENT_LAMBDA = os.environ.get('CALENDAR_EVENT_LAMBDA')
-EVENT_CLASSIFIER_LAMBDA = os.environ.get('EVENT_CLASSIFIER_LAMBDA')
+CALENDAR_EVENT = os.environ.get('CALENDAR_EVENT_LAMBDA',None)
+EVENT_CLASSIFIER = os.environ.get('EVENT_CLASSIFIER_LAMBDA',None)
 
 def clean_message(message):
     "Clean up the message received"
@@ -65,7 +65,7 @@ def lambda_handler(event, context):
     if is_pto_flag and user != os.environ.get('Qxf2Bot_USER'):
         message_to_send = f'Detected PTO message {cleaned_message}'
         write_message(message_to_send, os.environ.get('SEND_CHANNEL'))
-        if os.environ.get(EVENT_CLASSIFIER_LAMBDA):
+        if CALENDAR_EVENT is not None:
             invoke_type = 'RequestResponse'
             try:
                 classifier_response = invoke_lambda(EVENT_CLASSIFIER_LAMBDA,invoke_type,message)
@@ -73,7 +73,7 @@ def lambda_handler(event, context):
                 if classifier_payload.get('statusCode')==200:
                     pto_date = classifier_payload.get('body')
                     write_message(f'Detected PTO dates are {pto_date}', os.environ.get('SEND_CHANNEL'))
-                    if os.environ.get(CALENDAR_EVENT_LAMBDA):
+                    if CALENDAR_EVENT is not None:
                         calendar_event_response = invoke_lambda(CALENDAR_EVENT_LAMBDA,invoke_type,pto_date)
                         calendar_event_payload = json.loads(calendar_event_response['Payload'].read())
                         if calendar_event_payload.get('statusCode')==200 and calendar_event_payload.get('body') == "calendar event created":
