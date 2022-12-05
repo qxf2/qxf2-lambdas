@@ -46,9 +46,10 @@ def get_url(message):
 
     return urls
 
-def post_to_newsletter(final_url, article_editor, category_id = '2'):
+def post_to_newsletter(final_url, article_editor, category_id = '5'):
     "Method to call the newsletter API and post the url"
     url = os.environ.get('URL', '')
+    category_id = os.environ.get('DEFAULT_CATEGORY', category_id)
     headers = {'x-api-key' : os.environ.get('API_KEY_VALUE','')}
     for article_url in final_url:
         data = {'url': article_url, 'category_id': category_id, 'article_editor': article_editor}
