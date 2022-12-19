@@ -1,5 +1,6 @@
 """
-This script helps in fetching the devices registered with remote.it account
+This script contains functions that fetch the devices registered with remote.it account, connect to the devices that are online
+and runs a command
 """
 import json
 import sys
