@@ -1,6 +1,0 @@
-import os
-USERNAME = os.environ['USERNAME']
-PASSWORD = os.environ['PASSWORD']
-PROXY_USERNAME = os.environ['PROXY_USERNAME']
-PROXY_PASSWORD = os.environ['PROXY_PASSWORD']
-DEVELOPER_KEY = os.environ['DEVELOPER_KEY']
