@@ -5,7 +5,7 @@ import datetime
 from base64 import b64decode
 import httpsig
 import config
-from config import HOST
+from config import REMOTEIT_HOST
 
 DEVELOPER_KEY = config.DEVELOPER_KEY
 ACCESS_KEY_ID = config.ACCESS_KEY_ID
@@ -38,7 +38,7 @@ def get_headers(request_method, path, content_length=0):
     date = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S%z")
 
     headers = {
-        "host": HOST,
+        "host": REMOTEIT_HOST,
         "date": date,
         "content-type": CONTENT_TYPE,
         "DeveloperKey": DEVELOPER_KEY,

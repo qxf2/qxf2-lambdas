@@ -17,8 +17,8 @@ def run_command_in_pi(command, proxy_data, conn):
     try:
         ssh.connect(
             proxy_data["proxy_server"],
-            username=config.PROXY_USERNAME,
-            password=config.PROXY_PASSWORD,
+            username=config.PI_USERNAME,
+            password=config.PI_PASSWORD,
             port=proxy_data["proxy_port"],
             banner_timeout=20,
         )

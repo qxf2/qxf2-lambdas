@@ -8,7 +8,7 @@ import time
 import requests
 from http_signature_helper import get_headers
 from raspberry_helper import run_command_in_pi
-from config import HOST
+from config import REMOTEIT_HOST
 
 
 def list_devices():
@@ -16,7 +16,7 @@ def list_devices():
     listing_url = "/apv/v27/device/list/all"
     headers = get_headers("GET", listing_url)
     try:
-        response = requests.get("https://" + HOST + listing_url, headers=headers)
+        response = requests.get("https://" + REMOTEIT_HOST + listing_url, headers=headers)
         list_data = json.loads(response.text)
         if list_data["status"] != "true":
             print("Unable to fetch list of devices: ", list_data["reason"])
@@ -54,7 +54,7 @@ def connect_and_run(command, device_address, device_alias, conn):
     try:
         time_now = time.time()
         response = requests.post(
-            "https://" + HOST + url_path, headers=headers, data=body
+            "https://" + REMOTEIT_HOST + url_path, headers=headers, data=body
         )
         print("Got response: {}", response.text)
         connect_data = json.loads(response.text)
