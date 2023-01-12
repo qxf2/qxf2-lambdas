@@ -1,6 +1,7 @@
 """
-Lambda to connect to raspberry pi using remote.it. All devices must be registered with
-remote.it account. It will connect to all online devices and play out an audio message.
+Lambda to connect to raspberry pi using remote.it.
+All devices must be registered with remote.it account.
+It will connect to all online devices and play out an audio message.
 """
 
 from multiprocessing import Pipe, Process
