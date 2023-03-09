@@ -4,7 +4,7 @@ on:
     branches:
       - test_example_rust_lambda
     paths:
-      - 'example_rust_lambda/**'
+      - 'example_rust_lambdas/**'
 jobs:
   build:
     runs-on: ubuntu-latest
