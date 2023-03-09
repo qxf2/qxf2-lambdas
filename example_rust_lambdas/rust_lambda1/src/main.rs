@@ -12,7 +12,7 @@ async fn function_handler(_event: Request) -> Result<Response<Body>, Error> {
     let resp = Response::builder()
         .status(200)
         .header("content-type", "text/html")
-        .body("Lambda1".into())
+        .body("Hello AWS Lambda HTTP request".into())
         .map_err(Box::new)?;
     Ok(resp)
 }
