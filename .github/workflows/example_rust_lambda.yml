@@ -4,7 +4,7 @@ on:
     branches:
       - test_example_rust_lambda
     paths:
-      - 'example_rust_lambdas/**'
+      - 'rust_lambda1/**'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,7 +13,7 @@ jobs:
     - name: Deploy code to Lambda
       uses: qxf2/rust-lambda-action@v1.0.1
       with:
-        lambda_directory: 'example_rust_lambdas'
+        lambda_directory: 'rust_lambda1'
         iam_role: arn:aws:iam::285993504765:role/lambda-deployer
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
