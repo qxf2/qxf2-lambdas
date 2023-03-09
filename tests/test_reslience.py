@@ -1,7 +1,6 @@
 """
-This is relience testing to test the impact of sending
-tones of messages to the listener
-
+This is a reliability testing to test the impact of sending
+tons of messages to the listener.
 """
 
 import os
@@ -10,18 +9,22 @@ import time
 import boto3
 
 sqs = boto3.client('sqs')
+newsletter_queue_url = os.environ.get('newsletter_queue_url')
 
-def send_messages_to_sqs():
-    "Send messages continuously"
-    for range (20):
-        queue_url = 'value'
+def test_send_messages_to_sqs():
+    """Send messages continuously"""
+    response_messages = []
+    message_count = 20
+    for count in range(message_count):
         response = sqs.send_message(
-        QueueUrl=queue_url,
-        DelaySeconds=10,
-        MessageAttributes={
+            QueueUrl=newsletter_queue_url,
+            DelaySeconds=10,
             MessageBody=(
                 'Information about current NY Times fiction bestseller for '
                 'week of 12/11/2016.'
-            )
+            ),
         )
-        print(response['MessageId'])
+        #print(response['MessageId'])
+        response_messages.append(response['MessageId'])
+
+    assert len(response_messages) == message_count
