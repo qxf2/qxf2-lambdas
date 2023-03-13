@@ -46,7 +46,7 @@ def test_url_filter(mock_message_contents, mock_clean_message, mock_post, senten
     result_status_code = "This is from the test"
     mock_post.return_value = result_status_code
     mock_clean_message.return_value = sentence
-    channel = "19:f33e901e871d4c3c9ebbbbee66e59ebe@thread.skype"
+    channel = "19:1941d15dada14943b5d742f2acdb99aa@thread.skype"
     os.environ['ETC_CHANNEL'] = channel
     mock_message_contents.return_value = {'msg': sentence,
                                         'chat_id': channel,
