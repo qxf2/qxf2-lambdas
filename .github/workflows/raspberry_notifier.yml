@@ -1,0 +1,23 @@
+name: deploy-raspberry-notifier
+on:
+  push:
+    branches: 
+      - master
+    paths:
+      - 'raspberry_notifier/**'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Deploy code to Lambda
+      uses: qxf2/py-lambda-action@v1.0.2
+      with:
+        lambda_directory: 'raspberry_notifier'
+        lambda_function_name: 'arn:aws:lambda:ap-south-1:285993504765:function:raspberry-notifier'
+        lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:raspberry-manual-layer:1'
+        requirements_txt: 'raspberry_notifier/requirements.txt'
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ secrets.SKYPE_SENDER_REGION }}

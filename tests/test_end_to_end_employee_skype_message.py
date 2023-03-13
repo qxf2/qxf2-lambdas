@@ -71,7 +71,7 @@ class Skypemessagetest():
             tests.helpers.sqs_helper.purge_sqs_queue(every_queue_url)
             time.sleep(1)
 
-class TestEndtoEndSkypeMessage(unittest.TestCase):
+class TestEndtoEndSkypeMessage():
     """
     Test class
     """

@@ -1,5 +1,5 @@
 """
-Unit tests for write_message method pf pto_detector lambda
+Code level tests for write_message method pf pto_detector lambda
 """
 import os
 import sys
@@ -40,7 +40,7 @@ class TestWriteMessage(object):
 
     def test_pto_detector_write_message(self):
         """
-        Unit test message for write_messsage
+        Code level test for write_messsage
         """
         sqs = boto3.resource('sqs')
         queue = sqs.create_queue(QueueName='test-skype-sender')
