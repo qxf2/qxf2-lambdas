@@ -2,7 +2,7 @@ name: deploy-comment-reviewer
 on:
   push:
     branches:
-      - comment-reviewer
+      - master
     paths:
       - 'comment_reviewer/**'
 jobs:
