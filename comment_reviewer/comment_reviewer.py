@@ -5,22 +5,19 @@ This Lambda will :
 import json
 import os
 import boto3
-
 QUEUE_URL = 'https://sqs.ap-south-1.amazonaws.com/285993504765/skype-sender'
 at_Qxf2Bot = '<at id="8:live:.cid.92bd244e945d8335">qxf2bot</at>!'
 at_Qxf2Bot_english = '@qxf2bot!'
-
 COMMANDS = [f'comment reviewers, please {at_Qxf2Bot}',
             f'i need comment reviewers {at_Qxf2Bot}',
             f'comment reviewers please {at_Qxf2Bot}',
             f'comment reviewers, please {at_Qxf2Bot_english}',
             f'i need comment reviewers {at_Qxf2Bot_english}',
             f'comment reviewers please {at_Qxf2Bot_english}']
-
 FIRST_SSM = 'first_comment_reviewer_index'
-SECOND_SSM= 'second_comment_reviewer_index'
-RESET_COMMANDS = [f'reset first comment reviewer {at_Qxf2Bot}',
-                f'reset second comment reviewer {at_Qxf2Bot}']
+SECOND_SSM = 'second_comment_reviewer_index'
+RESET_COMMANDS = [f'reset primary code reviewer {at_Qxf2Bot}',
+                f'reset secondary code reviewer {at_Qxf2Bot}']
 
 
 def read_parameter(client, parameter_name, decryption_flag = False):
@@ -43,19 +40,19 @@ def get_reviewer_index(reviewer_type):
     "Return the index of the reviewer"
     client = boto3.client("ssm")
     reviewer_index = read_parameter(client, reviewer_type)
-
+    
     return int(reviewer_index)
 
 def update_reviewer_index(reviewer_type,increment=1):
     "Increment the reviewer index by 1"
     client = boto3.client("ssm")
     reviewer_index = read_parameter(client, reviewer_type)
-    write_parameter(client,
+    write_parameter(client, 
     reviewer_type,
     str(int(reviewer_index) + increment))
 
-def get_code_reviewers(reviewer_type):
-    "Return a list of primary comment reviewers"
+def get_comment_reviewers(reviewer_type):
+    "Return a list of primary code reviewers"
     return os.environ.get(reviewer_type,"").split(',')
 
 def get_message_contents(event):
@@ -88,15 +85,15 @@ def is_reviewer_reset_command(message):
     return message.lower() in RESET_COMMANDS
 
 def get_reply():
-    "Get the primary and secondary comment reviewers"
-    first_comment_reviewers = get_code_reviewers('first_comment_reviewers')
-    second_comment_reviewers = get_code_reviewers('second_comment_reviewers')
-    first_index = get_reviewer_index(FIRST_SSM)
-    second_index = get_reviewer_index(SECOND_SSM)
-    first_comment_reviewer = first_comment_reviewers[first_index%len(first_comment_reviewers)]
-    second_comment_reviewer = second_comment_reviewers[second_index%len(second_comment_reviewers)]
-    reply = f'first comment reviewer: {first_comment_reviewer}\n\nsecond comment reviewer: {second_comment_reviewer}'
-
+    "Get the primary and secondary code reviewers"
+    first_comment_reviewers = get_comment_reviewers('first_comment_reviewers')
+    second_comment_reviewers = get_comment_reviewers('second_comment_reviewers')
+    primary_index = get_reviewer_index(FIRST_SSM)
+    secondary_index = get_reviewer_index(SECOND_SSM)
+    first_comment_reviewer = first_comment_reviewers[primary_index%len(first_comment_reviewers)]
+    second_comment_reviewer = second_comment_reviewers[secondary_index%len(second_comment_reviewers)]
+    reply = f'First comment reviewer: {first_comment_reviewer}\n\nSecond comment reviewer: {second_comment_reviewer}\n'
+    
     return reply
 
 def update_reviewer_indexes():
