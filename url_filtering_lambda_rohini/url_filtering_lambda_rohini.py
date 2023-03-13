@@ -51,11 +51,14 @@ def post_to_newsletter(final_url, article_editor, category_id = '5'):
     url = os.environ.get('URL', '')
     category_id = os.environ.get('DEFAULT_CATEGORY', category_id)
     headers = {'x-api-key' : os.environ.get('API_KEY_VALUE','')}
-    for article_url in final_url:
-        data = {'url': article_url, 'category_id': category_id, 'article_editor': article_editor}
-        response = requests.post(url, data = data, headers = headers)
-        print(response.status_code)
-    return response.status_code
+    response_status = ""
+    if len(final_url) != 0:
+        for article_url in final_url:
+            data = {'url': article_url, 'category_id': category_id, 'article_editor': article_editor}
+            response = requests.post(url, data = data, headers = headers)
+            response_status = response.status_code
+            print(response_status)
+    return response_status          
 
 def pick_random_user(article_editors_list):
     "Return a random employee to edit the article"
