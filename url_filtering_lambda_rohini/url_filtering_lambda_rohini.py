@@ -22,6 +22,8 @@ def clean_message(message):
 
 def get_message_contents(event):
     "Retrieve the message contents from the SQS event"
+    print(event)
+    print(event.get('Records'))
     record = event.get('Records')[0]
     message = record.get('body')
     message = json.loads(message)['Message']
