@@ -24,12 +24,16 @@ def get_message_contents(event):
     "Retrieve the message contents from the SQS event"
     print(event)
     print(event.get('Records'))
-    record = event.get('Records')[0]
-    message = record.get('body')
-    message = json.loads(message)['Message']
-    message = json.loads(message)
+    records = event.get('Records')
+    messages = []
+    for record in records:
+        #record = event.get('Records')[entry]
+        message = record.get('body')
+        message = json.loads(message)['Message']
+        message = json.loads(message)
+        messages.append(message)
 
-    return message
+    return messages
 
 def get_url(message):
     "Get the URL from the message"
@@ -96,30 +100,36 @@ def lambda_handler(event, context):
     calls the filtering logic
     calls the logic to post to endpoint
     """
-    content = get_message_contents(event)
-    message = content['msg']
-    channel = content['chat_id']
-    user = content['user_id']
-    print(f'{message}, {user}, {channel}')
+    messages = get_message_contents(event)
+    responses = []
+    url_list = []
+    for content in messages:
+        message = content['msg']
+        channel = content['chat_id']
+        user = content['user_id']
+        print(f'{message}, {user}, {channel}')
 
-    response=""
-    final_url=[]
-    if channel == os.environ.get('ETC_CHANNEL') and user != os.environ.get('Qxf2Bot_USER'):
-        print("Getting message posted on ETC ")
-        cleaned_message = clean_message(message)
-        final_url=get_url(cleaned_message)
-        #Filtered URL is printed by lambda
-        print("Final url is :",final_url)
-        if final_url:
-            reply,article_editor = get_reply()
-            response = post_to_newsletter(final_url, article_editor)
-            write_message(reply, os.environ.get('ETC_CHANNEL',''))
+        response=""
+        final_url=[]
+        if channel == os.environ.get('ETC_CHANNEL') and user != os.environ.get('Qxf2Bot_USER'):
+            print("Getting message posted on ETC ")
+            cleaned_message = clean_message(message)
+            final_url=get_url(cleaned_message)
+            #Filtered URL is printed by lambda
+            print("Final url is :",final_url)
+            if final_url:
+                reply,article_editor = get_reply()
+                response = post_to_newsletter(final_url, article_editor)
+                responses.append(response)
+                for url in final_url:
+                    url_list.append(url)
+                write_message(reply, os.environ.get('ETC_CHANNEL',''))
+            else:
+                print("message does not contain any url")
         else:
-            print("message does not contain any url")
-    else:
-        print("Message not from ETC channel")
+            print("Message not from ETC channel")
 
     return {
-        'statusCode': response,
-        'body': json.dumps(final_url)
+        'statusCode': json.dumps(responses),
+        'body': json.dumps(url_list)
     }
