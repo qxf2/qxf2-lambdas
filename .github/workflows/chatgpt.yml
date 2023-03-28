@@ -1,0 +1,23 @@
+name: deploy-comment-reviewer
+on:
+  push:
+    branches:
+      - qxf2bot-goes-to-college
+    paths:
+      - 'chatgpt/**'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Deploy code to Lambda
+      uses: qxf2/py-lambda-action@v1.0.2
+      with:
+        lambda_directory: 'chatgpt'
+        lambda_function_name: ${{ secrets.CHATGPT_ARN}}
+        lambda_layer_arn: ${{ secrets.CHATGPT_LAYER_ARN}}
+        requirements_txt: 'chatgpt/requirements.txt'
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ secrets.SKYPE_SENDER_REGION }}
