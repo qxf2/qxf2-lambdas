@@ -7,8 +7,8 @@ import os
 import boto3
 import openai
 
-QUEUE_URL = os.getenv(SKYPE_SENDER_QUEUE, "INVALID SKYPE SENDER QUEUE")
-at_Qxf2Bot = os.getenv(AT_QXF2BOT, "INVALID QXF2BOT SETTING")
+QUEUE_URL = os.getenv("SKYPE_SENDER_QUEUE", "INVALID SKYPE SENDER QUEUE")
+at_Qxf2Bot = os.getenv("AT_QXF2BOT", "INVALID QXF2BOT SETTING")
 at_Qxf2Bot_english = "@qxf2bot!"
 COMMANDS = [
     f"help {at_Qxf2Bot}",
