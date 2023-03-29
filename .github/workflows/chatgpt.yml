@@ -2,7 +2,7 @@ name: deploy-comment-reviewer
 on:
   push:
     branches:
-      - qxf2bot-goes-to-college
+      - main
     paths:
       - 'chatgpt/**'
 jobs:
