@@ -57,12 +57,22 @@ def get_reply(message):
     openai.api_key = os.getenv("OPENAI_API_KEY", "")
     model_engine = os.getenv("MODEL_ENGINE", "")
     response = openai.ChatCompletion.create(
-        model=model_engine, messages=[{"role": "user", "content": message}]
+        model=model_engine,
+        messages=[
+            {"role": "system", "content": "Keep it short and simple."},
+            {"role": "user", "content": message},
+        ],
     )
     reply = f"{response['choices'][0]['message']['content']}. Usage stats: {response['usage']['total_tokens']}"
 
     return reply
 
+def clean_reply(reply):
+    "Remove quotes and apostrophes"
+    reply = reply.replace("'", "")
+    reply = reply.replace('"', '')
+    
+    return reply 
 
 def lambda_handler(event, context):
     "Code reviewer lambda"
@@ -74,5 +84,5 @@ def lambda_handler(event, context):
         if is_help_command(message):
             reply = get_reply(message)
             write_message(reply, channel)
-        
+
     return {"statusCode": 200, "body": json.dumps("Done!")}
