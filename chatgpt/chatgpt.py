@@ -83,6 +83,6 @@ def lambda_handler(event, context):
         user = message_content["user_id"]
         if is_help_command(message):
             reply = get_reply(message)
-            write_message(reply, channel)
+            write_message(clean_reply(reply), channel)
 
     return {"statusCode": 200, "body": json.dumps("Done!")}
