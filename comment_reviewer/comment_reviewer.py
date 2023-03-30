@@ -106,29 +106,30 @@ def update_reviewer_indexes():
 
 def lambda_handler(event, context):
     "Code reviewer lambda"
-    message_contents = get_message_contents(event)
-    message = message_contents['msg'].strip()
-    channel = message_contents['chat_id']
-    user = message_contents['user_id']
+    messages = get_message_contents(event)
+    for message_contents in messages
+        message = message_contents['msg'].strip()
+        channel = message_contents['chat_id']
+        user = message_contents['user_id']
 
-    if in_correct_channel(channel):
-        if is_code_reviewer_command(message):
-            reply = get_reply()
-            write_message(reply, os.environ.get('channel',''))
-            update_reviewer_indexes()
-        if is_reviewer_reset_command(message):
-            prev = -1
-            curr = -1
-            if 'primary' in message.lower():
-                prev = get_reviewer_index(FIRST_SSM)
-                update_reviewer_index(FIRST_SSM, -1)
-                curr = get_reviewer_index(FIRST_SSM)
-            if 'secondary' in message.lower():
-                prev = get_reviewer_index(SECOND_SSM)
-                update_reviewer_index(SECOND_SSM, -1)
-                curr = get_reviewer_index(SECOND_SSM)
-            message = f'Reset index from {prev} to {curr}'
-            write_message(message, os.environ.get('channel',''))
+        if in_correct_channel(channel):
+            if is_code_reviewer_command(message):
+                reply = get_reply()
+                write_message(reply, os.environ.get('channel',''))
+                update_reviewer_indexes()
+            if is_reviewer_reset_command(message):
+                prev = -1
+                curr = -1
+                if 'primary' in message.lower():
+                    prev = get_reviewer_index(FIRST_SSM)
+                    update_reviewer_index(FIRST_SSM, -1)
+                    curr = get_reviewer_index(FIRST_SSM)
+                if 'secondary' in message.lower():
+                    prev = get_reviewer_index(SECOND_SSM)
+                    update_reviewer_index(SECOND_SSM, -1)
+                    curr = get_reviewer_index(SECOND_SSM)
+                message = f'Reset index from {prev} to {curr}'
+                write_message(message, os.environ.get('channel',''))
 
     return {
         'statusCode': 200,
