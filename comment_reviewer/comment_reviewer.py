@@ -57,12 +57,15 @@ def get_comment_reviewers(reviewer_type):
 
 def get_message_contents(event):
     "Retrieve the message contents from the SQS event"
-    record = event.get('Records')[0]
-    message = record.get('body')
-    message = json.loads(message)['Message']
-    message = json.loads(message)
+    messages = []
+    records = event.get('Records')
+    for record in records:
+        message = record.get('body')
+        message = json.loads(message)['Message']
+        message = json.loads(message)
+        messages.append(message)
 
-    return message
+    return messages
 
 def write_message(message, channel):
     "Send a message to Skype Sender"
