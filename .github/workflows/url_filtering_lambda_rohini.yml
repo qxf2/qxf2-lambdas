@@ -16,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Deploy code to Lambda
-      uses: qxf2/py-lambda-action@v1.0.2
+      uses: qxf2/py-lambda-action@v1.0.3
       with:
         lambda_directory: 'url_filtering_lambda_rohini'
         lambda_function_name: ${{secrets.ARN }}
@@ -33,7 +33,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Deploy code to Lambda
-      uses: qxf2/py-lambda-action@v1.0.2
+      uses: qxf2/py-lambda-action@v1.0.3
       with:
         lambda_directory: 'url_filtering_lambda_rohini'
         lambda_function_name: 'arn:aws:lambda:ap-south-1:285993504765:function:URLFilteringLambdaRohini'

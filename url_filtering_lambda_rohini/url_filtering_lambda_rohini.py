@@ -1,5 +1,6 @@
 """
 Lambda to to pull URL from ETC channel messages
+And post any URL to the newsletter generator
 """
 import json
 import os
@@ -8,6 +9,7 @@ import random
 import boto3
 import requests
 import validators
+import openai
 
 EXCLUDE_URL_STRINGS = ['skype.com', 'meet.google.com', 'trello.com/b']
 QUEUE_URL = 'https://sqs.ap-south-1.amazonaws.com/285993504765/skype-sender'
@@ -28,6 +30,39 @@ def get_message_contents(event):
     message = json.loads(message)
 
     return message
+
+def process_reply(reply):
+    "Strip out the title and summary"
+    title = "FILL THIS PLEASE!"
+    summary = "Dear Human, FILL THIS PLEASE!"
+
+    if 'TITLE:' in reply and 'SUMMARY:' in reply:
+        title = reply.split('TITLE:')[-1].split('SUMMARY:')[0].strip()
+        summary = reply.split('SUMMARY:')[-1].strip()
+
+    return title, summary
+
+def ask_the_all_knowing_one(input_message, max_tokens=512):
+    "Return the ChatGPT response"
+    openai.api_key = os.environ.get('CHATGPT_API_KEY', '')
+    model_engine = os.environ.get('CHATGPT_VERSION', 'gpt-3.5-turbo')
+
+    input_message = f"I want you to format your reply in a specific manner to this request. I am going to send you an article (in quotes at the end of this message). You tell me its title and summary. Use no more than 3 sentences for the summary. Preface the title with the exact string TITLE: and preface the summary with the exact string SUMMARY: If you do not know, then put TITLE: UNKNOWN and SUMMARY: UNKNOWN. Ok, here is the article '{input_message}'"
+
+    response = openai.ChatCompletion.create(
+            model=model_engine,
+            messages=[
+                {"role": "user", "content": input_message},
+            ],
+            max_tokens=max_tokens
+        )
+    return response["choices"][0]["message"]["content"]
+
+def get_title_summary(article_url):
+    "Ask ChatGPT for the title and summary"
+    reply = ask_the_all_knowing_one(article_url)
+
+    return process_reply(reply)
 
 def get_url(message):
     "Get the URL from the message"
@@ -54,7 +89,12 @@ def post_to_newsletter(final_url, article_editor, category_id = '5'):
     response_status = ""
     if len(final_url) != 0:
         for article_url in final_url:
-            data = {'url': article_url, 'category_id': category_id, 'article_editor': article_editor}
+            title, summary = get_title_summary(article_url)
+            data = {'url': article_url, 
+                    'title': title,
+                    'description': summary,
+                    'category_id': category_id, 
+                    'article_editor': article_editor}
             response = requests.post(url, data = data, headers = headers)
             response_status = response.status_code
             print(response_status)
