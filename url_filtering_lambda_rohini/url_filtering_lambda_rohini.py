@@ -44,10 +44,7 @@ def process_reply(reply):
 
 def ask_the_all_knowing_one(input_message, max_tokens=512):
     "Return the ChatGPT response"
-    # First, you need to set up your API key
     openai.api_key = os.environ.get('CHATGPT_API_KEY', '')
-
-    # Then, you can call the "gpt-3.5-turbo" model
     model_engine = os.environ.get('CHATGPT_VERSION', 'gpt-3.5-turbo')
 
     input_message = f"I want you to format your reply in a specific manner to this request. I am going to send you an article (in quotes at the end of this message). You tell me its title and summary. Use no more than 3 sentences for the summary. Preface the title with the exact string TITLE: and preface the summary with the exact string SUMMARY: If you do not know, then put TITLE: UNKNOWN and SUMMARY: UNKNOWN. Ok, here is the article '{input_message}'"
