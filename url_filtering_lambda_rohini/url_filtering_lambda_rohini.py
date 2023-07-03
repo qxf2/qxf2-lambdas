@@ -123,7 +123,13 @@ def get_article_editor(employee_list):
 
 def write_message(message, channel):
     "Send a message to Skype Sender"
-    sqs = boto3.client('sqs')
+    # Check if running on localstack or production environment
+    is_localstack = os.environ.get('LOCALSTACK_ENV') == 'true'
+
+    if is_localstack:
+        sqs = boto3.client('sqs',endpoint_url= 'http://localstack:4566')
+    else:
+        sqs = boto3.client('sqs')
     print(channel)
     message = str({'msg':f'{message}', 'channel':channel})
     print(message)
