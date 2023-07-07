@@ -10,7 +10,7 @@ use sheets4::Sheets;
 async fn main() {
     // Get an ApplicationSecret instance by some means. It contains the `client_id` and
     // `client_secret`, among other things.
-    let secret = yup_oauth2::read_application_secret("src/credentials.json")
+    let secret = yup_oauth2::read_application_secret("credentials.json")
         .await
         .expect("client secret could not be read");
 
