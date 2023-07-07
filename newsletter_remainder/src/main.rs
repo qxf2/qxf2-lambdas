@@ -10,9 +10,9 @@ use sheets4::Sheets;
 async fn main() {
     // Get an ApplicationSecret instance by some means. It contains the `client_id` and
     // `client_secret`, among other things.
-    let secret = yup_oauth2::read_application_secret("src/credentials.json")
+    let secret = yup_oauth2::read_service_account_key("src/newsletter-remainder.json")
         .await
-        .expect("client secret could not be read");
+        .unwrap();
 
 
     // Instantiate the authenticator. It will choose a suitable authentication flow for you,
@@ -20,14 +20,10 @@ async fn main() {
     // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
     // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
     // retrieve them from storage.
-    let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-        secret,
-        yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-    )
-    .persist_tokens_to_disk("tokencache.json")
-    .build()
-    .await
-    .unwrap();
+    let auth = yup_oauth2::ServiceAccountAuthenticator::builder(secret)
+        .build()
+        .await
+        .unwrap();
 
     let https_connector = hyper_tls::HttpsConnector::new();
     let client = hyper::Client::builder().build::<_, hyper::Body>(https_connector);
