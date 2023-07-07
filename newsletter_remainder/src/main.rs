@@ -2,11 +2,8 @@ extern crate google_sheets4 as sheets4;
 extern crate hyper;
 extern crate hyper_tls;
 extern crate yup_oauth2 as oauth2;
-
 use sheets4::Error;
 use sheets4::Sheets;
-
-
 use rusoto_core::Region;
 use rusoto_sqs::{SendMessageRequest, Sqs, SqsClient};
 
@@ -118,6 +115,4 @@ async fn main() {
             }
         }
     }
-
-
 }
