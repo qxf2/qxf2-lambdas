@@ -34,41 +34,65 @@ async fn main() {
 
     let hub = Sheets::new(client, auth);
 
-    let result = hub
-        .spreadsheets()
-        .get("14hKG2KauvpHCBeK4wUtMYnl5u0kD4hQTAzTejFr3nlQ") // your spreadsheet id enters here
-        .doit()
-        .await;
+    // let result = hub
+    //     .spreadsheets()
+    //     .get("14hKG2KauvpHCBeK4wUtMYnl5u0kD4hQTAzTejFr3nlQ") // your spreadsheet id enters here
+    //     .doit()
+    //     .await;
 
-    // println!("{:?}", result);
-    match result {
-        Err(e) => match e {
-            // The Error enum provides details about what exactly happened.
-            // You can also just use its `Debug`, `Display` or `Error` traits
-            Error::HttpError(_)
-            | Error::Io(_)
-            | Error::MissingAPIKey
-            | Error::MissingToken(_)
-            | Error::Cancelled
-            | Error::UploadSizeLimitExceeded(_, _)
-            | Error::Failure(_)
-            | Error::BadRequest(_)
-            | Error::FieldClash(_)
-            | Error::JsonDecodeError(_, _) => println!("{}", e),
-        },
-        Ok(res) => println!("Success: {:?}", res),
-    }
+    // // println!("{:?}", result);
+    // match result {
+    //     Err(e) => match e {
+    //         // The Error enum provides details about what exactly happened.
+    //         // You can also just use its `Debug`, `Display` or `Error` traits
+    //         Error::HttpError(_)
+    //         | Error::Io(_)
+    //         | Error::MissingAPIKey
+    //         | Error::MissingToken(_)
+    //         | Error::Cancelled
+    //         | Error::UploadSizeLimitExceeded(_, _)
+    //         | Error::Failure(_)
+    //         | Error::BadRequest(_)
+    //         | Error::FieldClash(_)
+    //         | Error::JsonDecodeError(_, _) => println!("{}", e),
+    //     },
+    //     Ok(res) => println!("Success: {:?}", res),
+    // }
 
     let spreadsheet_id = "14hKG2KauvpHCBeK4wUtMYnl5u0kD4hQTAzTejFr3nlQ";
-    let range = "Newsletter!A1:C3";
-
-    let result1 = hub
+    let sheet_name = "Newsletter";
+    
+    // Get the last row number
+    let last_row_range = format!("{}!A:A", sheet_name);
+    let last_row_result = hub
         .spreadsheets()
-        .values_get(spreadsheet_id, range)
+        .values_get(spreadsheet_id, &last_row_range)
         .doit()
         .await;
 
-    match result1 {
+    let last_row_values = match last_row_result {
+        Ok(res) => {
+            if let Some(values) = res.1.values {
+                values.len()
+            } else {
+                0
+            }
+        }
+        Err(e) => {
+            println!("Error retrieving last row: {}", e);
+            return;
+        }
+    };
+
+    // Fetch the values of the last row
+    let range = format!("{}!A{}:Z{}", sheet_name, last_row_values, last_row_values);
+    let result = hub
+        .spreadsheets()
+        .values_get(spreadsheet_id, &range)
+        .doit()
+        .await;
+
+    match result {
         Err(e) => match e {
             // The Error enum provides details about what exactly happened.
             // You can also just use its `Debug`, `Display`, or `Error` traits.
@@ -94,6 +118,5 @@ async fn main() {
         }
     }
 
-
-
 }
+
