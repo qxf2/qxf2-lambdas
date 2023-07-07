@@ -6,3 +6,16 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+google-sheets4 = "*"
+hyper = "^0.14"
+hyper-rustls = "^0.22"
+serde = "^1.0"
+serde_json = "^1.0"
+yup-oauth2 = "^3.0"
+tokio = { version = "1.28.0", features = [
+    "macros",
+    "io-util",
+    "rt",
+    "rt-multi-thread",
+    "fs",
+] }
