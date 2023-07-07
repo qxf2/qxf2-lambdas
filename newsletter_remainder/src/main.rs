@@ -58,4 +58,42 @@ async fn main() {
         },
         Ok(res) => println!("Success: {:?}", res),
     }
+
+    let spreadsheet_id = "14hKG2KauvpHCBeK4wUtMYnl5u0kD4hQTAzTejFr3nlQ";
+    let range = "Newsletter!A1:C3";
+
+    let result1 = hub
+        .spreadsheets()
+        .values_get(spreadsheet_id, range)
+        .doit()
+        .await;
+
+    match result1 {
+        Err(e) => match e {
+            // The Error enum provides details about what exactly happened.
+            // You can also just use its `Debug`, `Display`, or `Error` traits.
+            Error::HttpError(_)
+            | Error::Io(_)
+            | Error::MissingAPIKey
+            | Error::MissingToken(_)
+            | Error::Cancelled
+            | Error::UploadSizeLimitExceeded(_, _)
+            | Error::Failure(_)
+            | Error::BadRequest(_)
+            | Error::FieldClash(_)
+            | Error::JsonDecodeError(_, _) => println!("{}", e),
+        },
+        Ok(res) => {
+            if let Some(values) = res.1.values {
+                for row in values {
+                    println!("{:?}", row);
+                }
+            } else {
+                println!("No data found.");
+            }
+        }
+    }
+
+
+
 }

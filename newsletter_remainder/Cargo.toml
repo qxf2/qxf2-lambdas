@@ -10,7 +10,7 @@ serde = "*"
 serde_json = "*"
 hyper = "0.14"
 hyper-tls = "*"
-google-sheets4 = "5.0.2+20230119"
+google-sheets4 = "5.0.2"
 yup-oauth2 = "*"
 
 
