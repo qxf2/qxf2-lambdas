@@ -5,6 +5,35 @@ extern crate yup_oauth2 as oauth2;
 
 use sheets4::Error;
 use sheets4::Sheets;
+extern crate rusoto_core;
+extern crate rusoto_sqs;
+
+use rusoto_core::Region;
+use rusoto_sqs::{SendMessageRequest, Sqs, SqsClient};
+
+async fn send_message_to_sqs(queue_url: &str, msg: &str, channel: &str) -> Result<(), Box<dyn std::error::Error>> {
+    // Create an SQS client
+    let client = SqsClient::new(Region::ApSouth1);
+    
+    // Send a message to the SQS queue
+    let message = serde_json::json!({"msg": msg, "channel": channel}).to_string();
+    
+    let send_message_request = SendMessageRequest {
+        queue_url: queue_url.to_string(),
+        message_body: message,
+        ..Default::default()
+    };
+    
+    match client.send_message(send_message_request).await {
+        Ok(response) => {
+            println!("Message sent successfully. Message ID: {:?}", response.message_id);
+            Ok(())
+        }
+        Err(error) => {
+            Err(Box::new(error))
+        }
+    }
+}
 
 #[tokio::main]
 async fn main() {
@@ -14,12 +43,6 @@ async fn main() {
         .await
         .unwrap();
 
-
-    // Instantiate the authenticator. It will choose a suitable authentication flow for you,
-    // unless you replace `None` with the desired Flow.
-    // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
-    // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
-    // retrieve them from storage.
     let auth = yup_oauth2::ServiceAccountAuthenticator::builder(secret)
         .build()
         .await
@@ -29,31 +52,6 @@ async fn main() {
     let client = hyper::Client::builder().build::<_, hyper::Body>(https_connector);
 
     let hub = Sheets::new(client, auth);
-
-    // let result = hub
-    //     .spreadsheets()
-    //     .get("14hKG2KauvpHCBeK4wUtMYnl5u0kD4hQTAzTejFr3nlQ") // your spreadsheet id enters here
-    //     .doit()
-    //     .await;
-
-    // // println!("{:?}", result);
-    // match result {
-    //     Err(e) => match e {
-    //         // The Error enum provides details about what exactly happened.
-    //         // You can also just use its `Debug`, `Display` or `Error` traits
-    //         Error::HttpError(_)
-    //         | Error::Io(_)
-    //         | Error::MissingAPIKey
-    //         | Error::MissingToken(_)
-    //         | Error::Cancelled
-    //         | Error::UploadSizeLimitExceeded(_, _)
-    //         | Error::Failure(_)
-    //         | Error::BadRequest(_)
-    //         | Error::FieldClash(_)
-    //         | Error::JsonDecodeError(_, _) => println!("{}", e),
-    //     },
-    //     Ok(res) => println!("Success: {:?}", res),
-    // }
 
     let spreadsheet_id = "14hKG2KauvpHCBeK4wUtMYnl5u0kD4hQTAzTejFr3nlQ";
     let sheet_name = "Newsletter";
@@ -114,5 +112,12 @@ async fn main() {
         }
     }
 
+    let queue_url = "https://sqs.ap-south-1.amazonaws.com/285993504765/skype-sender";
+    let msg = "Test Message";
+    let channel = "19:1941d15dada14943b5d742f2acdb99aa@thread.skype";
+    
+    if let Err(error) = send_message_to_sqs(queue_url, msg, channel).await {
+        eprintln!("Failed to send message: {:?}", error);
+    }
 }
 

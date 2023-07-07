@@ -13,6 +13,7 @@ hyper-tls = "*"
 google-sheets4 = "5.0.2"
 yup-oauth2 = "*"
 
+rusoto_core = "0.48.0"
+rusoto_sqs = "0.48.0"
 
-
-tokio = { version = "*", features = ["full"] }
+tokio = { version = "1.28", features = ["full"] }
