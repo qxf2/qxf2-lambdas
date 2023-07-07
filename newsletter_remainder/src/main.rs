@@ -33,32 +33,6 @@ async fn main() {
     let client = hyper::Client::builder().build::<_, hyper::Body>(https_connector);
 
     let hub = Sheets::new(client, auth);
-
-    // let result = hub
-    //     .spreadsheets()
-    //     .get("14hKG2KauvpHCBeK4wUtMYnl5u0kD4hQTAzTejFr3nlQ") // your spreadsheet id enters here
-    //     .doit()
-    //     .await;
-
-    // // println!("{:?}", result);
-    // match result {
-    //     Err(e) => match e {
-    //         // The Error enum provides details about what exactly happened.
-    //         // You can also just use its `Debug`, `Display` or `Error` traits
-    //         Error::HttpError(_)
-    //         | Error::Io(_)
-    //         | Error::MissingAPIKey
-    //         | Error::MissingToken(_)
-    //         | Error::Cancelled
-    //         | Error::UploadSizeLimitExceeded(_, _)
-    //         | Error::Failure(_)
-    //         | Error::BadRequest(_)
-    //         | Error::FieldClash(_)
-    //         | Error::JsonDecodeError(_, _) => println!("{}", e),
-    //     },
-    //     Ok(res) => println!("Success: {:?}", res),
-    // }
-
     let spreadsheet_id = "14hKG2KauvpHCBeK4wUtMYnl5u0kD4hQTAzTejFr3nlQ";
     let sheet_name = "Newsletter";
     
@@ -119,4 +93,3 @@ async fn main() {
     }
 
 }
-
