@@ -6,6 +6,7 @@ use sheets4::Error;
 use sheets4::Sheets;
 use rusoto_core::Region;
 use rusoto_sqs::{SendMessageRequest, Sqs, SqsClient};
+use chrono::{Datelike, Duration, Local, Weekday};
 
 async fn send_message_to_sqs(queue_url: &str, msg: &str, channel: &str) -> Result<(), Box<dyn std::error::Error>> {
     // Create an SQS client
@@ -29,6 +30,23 @@ async fn send_message_to_sqs(queue_url: &str, msg: &str, channel: &str) -> Resul
             Err(Box::new(error))
         }
     }
+}
+
+fn get_current_week_wednesday() -> chrono::NaiveDate {
+    let local_now = Local::now().date();
+    let mut current_date = local_now;
+    
+    // Find the first day of the week (Sunday)
+    while current_date.weekday() != Weekday::Sun {
+        current_date -= Duration::days(1);
+    }
+    
+    // Find the Wednesday of the current week
+    while current_date.weekday() != Weekday::Wed {
+        current_date += Duration::days(1);
+    }
+    
+    current_date.naive_local()
 }
 
 #[tokio::main]
@@ -99,8 +117,18 @@ async fn main() {
             if let Some(values) = res.1.values {
                 for row in values {
                     println!("{:?}", row[1]);
-                    let msg = "Remainder: Newsletter Team for the week: ".to_owned()+ &row[1].to_string();
-              
+                    let current_week_wednesday = get_current_week_wednesday().format("%d/%m/%Y");
+                    println!("Current week's Wednesday: {}", current_week_wednesday);
+                    let last_row_date = row[2].to_string();
+                    let mut msg: String;
+                    if last_row_date.trim_matches('"') == current_week_wednesday.to_string(){
+                        msg = "Remainder: Newsletter Team for the week: ".to_owned()+ &row[1].to_string();
+                      
+                    }
+                    else{
+                        msg = "Remainder: No newsletter team selected for this week".to_string();
+                    }
+                    println!("{}",msg);                    
                     let queue_url = "https://sqs.ap-south-1.amazonaws.com/285993504765/skype-sender";
                     //let msg = my_string;
                     let channel = "19:1941d15dada14943b5d742f2acdb99aa@thread.skype";
@@ -108,8 +136,9 @@ async fn main() {
                     if let Err(error) = send_message_to_sqs(queue_url, &msg, channel).await {
                         eprintln!("Failed to send message: {:?}", error);
                     }
-
+                 
                 }
+
             } else {
                 println!("No data found.");
             }

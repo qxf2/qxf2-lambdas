@@ -16,4 +16,5 @@ yup-oauth2 = "*"
 rusoto_core = "0.48.0"
 rusoto_sqs = "0.48.0"
 
+chrono = "0.4"
 tokio = { version = "1.28", features = ["full"] }
