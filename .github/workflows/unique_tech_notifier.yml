@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - master
-      - pylint_unique_tech_notifier
     paths:
       - 'unique_tech_notifier/**'
 jobs:
