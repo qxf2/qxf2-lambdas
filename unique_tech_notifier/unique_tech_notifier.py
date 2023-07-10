@@ -8,6 +8,7 @@ import json
 import requests
 import boto3
 
+
 QUEUE_URL = 'https://sqs.ap-south-1.amazonaws.com/285993504765/skype-sender'
 ALL_TECH_URL = os.environ.get('ALL_TECH_URL')
 WEEKLY_TECH_URL = os.environ.get('WEEKLY_TECH_URL')
