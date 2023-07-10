@@ -1,3 +1,6 @@
+/*This module is used to read the Newsletter Google sheets and comapre the date from the last row to 
+current week wednesday date. If the Date matches then, send the corresponding newsletter team for the week
+via skype message, else send the message that no team has yet been selected for the week*/
 extern crate google_sheets4 as sheets4;
 extern crate hyper;
 extern crate hyper_tls;
@@ -9,6 +12,7 @@ use rusoto_sqs::{SendMessageRequest, Sqs, SqsClient};
 use chrono::{Datelike, Duration, Local, Weekday};
 
 async fn send_message_to_sqs(queue_url: &str, msg: &str, channel: &str) -> Result<(), Box<dyn std::error::Error>> {
+    //Send message to SQS
     // Create an SQS client
     let client = SqsClient::new(Region::ApSouth1);
     
@@ -33,6 +37,7 @@ async fn send_message_to_sqs(queue_url: &str, msg: &str, channel: &str) -> Resul
 }
 
 fn get_current_week_wednesday() -> chrono::NaiveDate {
+    //Get Wenesday of current week
     let local_now = Local::now().date();
     let mut current_date = local_now;
     
@@ -55,7 +60,6 @@ async fn main() {
     let secret = yup_oauth2::read_service_account_key("src/newsletter-remainder.json")
         .await
         .unwrap();
-
     let auth = yup_oauth2::ServiceAccountAuthenticator::builder(secret)
         .build()
         .await
@@ -63,7 +67,6 @@ async fn main() {
 
     let https_connector = hyper_tls::HttpsConnector::new();
     let client = hyper::Client::builder().build::<_, hyper::Body>(https_connector);
-
     let hub = Sheets::new(client, auth);
     let spreadsheet_id = "14hKG2KauvpHCBeK4wUtMYnl5u0kD4hQTAzTejFr3nlQ";
     let sheet_name = "Newsletter";
@@ -131,8 +134,7 @@ async fn main() {
                     println!("{}",msg);                    
                     let queue_url = "https://sqs.ap-south-1.amazonaws.com/285993504765/skype-sender";
                     //let msg = my_string;
-                    let channel = "19:1941d15dada14943b5d742f2acdb99aa@thread.skype";
-    
+                    let channel = "19:1941d15dada14943b5d742f2acdb99aa@thread.skype";    
                     if let Err(error) = send_message_to_sqs(queue_url, &msg, channel).await {
                         eprintln!("Failed to send message: {:?}", error);
                     }
