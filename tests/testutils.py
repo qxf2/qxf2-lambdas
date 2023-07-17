@@ -9,9 +9,9 @@ import boto3
 import botocore
 
 # Specify the paths and configuration
-LAMBDA_ZIP='../lambda_with_dependency.zip'
-LAMBDA_FOLDER_PATH = '../'
-REQUIREMENTS_FILE_PATH = '../requirements.txt'
+LAMBDA_ZIP='lambda_with_dependency.zip'
+LAMBDA_FOLDER_PATH = '../url_filtering_lambda_rohini'
+REQUIREMENTS_FILE_PATH = '../url_filtering_lambda_rohini/requirements.txt'
 CONFIG = botocore.config.Config(retries={'max_attempts': 0})
 LOCALSTACK_ENDPOINT = 'http://localhost.localstack.cloud:4566'
 

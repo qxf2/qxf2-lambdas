@@ -6,7 +6,7 @@ Test URL Filter Lambda on the LocalStack:
 """
 import time
 from unittest import TestCase
-import testutils
+import tests.testutils as testutils
 
 class UrlFilterLambdaLocalStackTest(TestCase):
     "Deploy Lambda, SQS on LocalStack and run the test"
