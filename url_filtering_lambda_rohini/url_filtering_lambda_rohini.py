@@ -12,7 +12,7 @@ import validators
 import openai
 
 EXCLUDE_URL_STRINGS = ['skype.com', 'meet.google.com', 'trello.com/b']
-QUEUE_URL = 'https://sqs.ap-south-1.amazonaws.com/285993504765/skype-sender'
+QUEUE_URL = os.environ.get('SKYPE_SENDER_QUEUE_URL')
 
 
 def clean_message(message):
@@ -47,7 +47,14 @@ def ask_the_all_knowing_one(input_message, max_tokens=512):
     openai.api_key = os.environ.get('CHATGPT_API_KEY', '')
     model_engine = os.environ.get('CHATGPT_VERSION', 'gpt-3.5-turbo')
 
-    input_message = f"I want you to format your reply in a specific manner to this request. I am going to send you an article (in quotes at the end of this message). You tell me its title and summary. Use no more than 3 sentences for the summary. Preface the title with the exact string TITLE: and preface the summary with the exact string SUMMARY: If you do not know, then put TITLE: UNKNOWN and SUMMARY: UNKNOWN. Ok, here is the article '{input_message}'"
+    input_message = "I want you to format your reply in a specific manner to this request." \
+                    "I am going to send you an article (in quotes at the end of this message)." \
+                    "You tell me its title and summary." \
+                    "Use no more than 3 sentences for the summary." \
+                    "Preface the title with the exact string TITLE: " \
+                    "and preface the summary with the exact string SUMMARY:" \
+                    "If you do not know, then put TITLE: UNKNOWN and SUMMARY: UNKNOWN." \
+                    f"Ok, here is the article '{input_message}'"
 
     response = openai.ChatCompletion.create(
             model=model_engine,
@@ -66,7 +73,9 @@ def get_title_summary(article_url):
 
 def get_url(message):
     "Get the URL from the message"
-    regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
+    regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)"
+    regex += r"(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))"
+    regex += r"(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
     url_patterns = re.findall(regex,message)
     urls = []
     for url in url_patterns:
@@ -90,7 +99,7 @@ def post_to_newsletter(final_url, article_editor, category_id = '5'):
     if len(final_url) != 0:
         for article_url in final_url:
             title, summary = get_title_summary(article_url)
-            data = {'url': article_url, 
+            data = {'url': article_url,
                     'title': title,
                     'description': summary,
                     'category_id': category_id, 
@@ -98,15 +107,15 @@ def post_to_newsletter(final_url, article_editor, category_id = '5'):
             response = requests.post(url, data = data, headers = headers)
             response_status = response.status_code
             print(response_status)
-    return response_status          
+    return response_status
 
 def pick_random_user(article_editors_list):
     "Return a random employee to edit the article"
     tmp = article_editors_list[:]
     result = [tmp.pop(random.randrange(len(tmp))) for _ in range(1)]
-    listToStr = ' '.join(map(str, result))
+    list_to_str = ' '.join(map(str, result))
 
-    return listToStr
+    return list_to_str
 
 def get_article_editor(employee_list):
     "Return a list of primary comment reviewers"
@@ -114,7 +123,13 @@ def get_article_editor(employee_list):
 
 def write_message(message, channel):
     "Send a message to Skype Sender"
-    sqs = boto3.client('sqs')
+    # Check if running on localstack or production environment
+    is_localstack = os.environ.get('LOCALSTACK_ENV') == 'true'
+
+    if is_localstack:
+        sqs = boto3.client('sqs',endpoint_url= 'http://localstack:4566')
+    else:
+        sqs = boto3.client('sqs')
     print(channel)
     message = str({'msg':f'{message}', 'channel':channel})
     print(message)

@@ -1,0 +1,26 @@
+# Compose file to start/run the LocalStack
+
+version: '3.8'
+
+services:
+  localstack:
+    container_name: "${LOCALSTACK_DOCKER_NAME-localstack_main}"
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"            # LocalStack Gateway
+      - "4510-4559:4510-4559"  # external services port range
+    environment:
+      - DEBUG=1     
+      - SERVICES=lambda,serverless,sqs   
+      - LAMBDA_REMOVE_CONTAINERS=false
+      - SQS_ENDPOINT_STRATEGY=path
+      - MAIN_DOCKER_NETWORK=ls
+    networks:
+      - ls
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+networks:
+  ls:
+    name: ls
