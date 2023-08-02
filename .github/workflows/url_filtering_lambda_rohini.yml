@@ -37,6 +37,13 @@ jobs:
           cd tests/
           pip install -r requirements.txt # Replace with your actual requirements file
       - name: Run tests
+        env:
+          CHATGPT_API_KEY: ${{secrets.CHATGPT_API_KEY}}
+          CHATGPT_VERSION: ${{secrets.CHATGPT_VERSION}}
+          DEFAULT_CATEGORY: ${{secrets.DEFAULT_CATEGORY}}
+          API_KEY_VALUE: ${{secrets.API_KEY_VALUE}}
+          URL: ${{secrets.URL}}
+          employee_list: ${{secrets.employee_list}}
         run: |
           cd tests/
           pytest -v -s test_url_filter_lambda_on_localstack.py
