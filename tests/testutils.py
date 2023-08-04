@@ -1,4 +1,4 @@
-"test utils for LocalStack tests"
+"This script provides utils for LocalStack tests"
 
 import json
 import os
