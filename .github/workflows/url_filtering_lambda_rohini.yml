@@ -31,11 +31,11 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: "3.8" # Replace with your desired Python version
+          python-version: "3.8" 
       - name: Install dependencies
         run: |
           cd tests/
-          pip install -r requirements.txt # Replace with your actual requirements file
+          pip install -r requirements.txt 
       - name: Run tests
         env:
           CHATGPT_API_KEY: ${{secrets.CHATGPT_API_KEY}}
