@@ -5,10 +5,56 @@ on:
     paths:
       - 'url_filtering_lambda_rohini/**'
       - '.github/workflows/url_filtering_lambda_rohini.yml'
+      - 'tests/docker-compose.yaml'
+      - 'tests/test_url_filter_lambda_on_localstack.py'
+      - 'tests/testutils.py'
 jobs:
+  test-lambda:
+    name: Test Lambda on LocalStack
+    environment:
+      name: localstack-url-filter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Set up Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+      - name: Start LocalStack
+        run: |
+          cd tests/
+          docker-compose -f docker-compose.yaml up -d
+      - name: Wait for LocalStack to be ready
+        run: |
+          timeout 300 bash -c 'until echo > /dev/tcp/localhost/4566; do sleep 1; done'
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8" 
+      - name: Install dependencies
+        run: |
+          cd tests/
+          pip install -r requirements.txt 
+      - name: Run tests
+        env:
+          CHATGPT_API_KEY: ${{secrets.CHATGPT_API_KEY}}
+          CHATGPT_VERSION: ${{secrets.CHATGPT_VERSION}}
+          DEFAULT_CATEGORY: ${{secrets.DEFAULT_CATEGORY}}
+          API_KEY_VALUE: ${{secrets.API_KEY_VALUE}}
+          URL: ${{secrets.URL}}
+          employee_list: ${{secrets.employee_list}}
+        run: |
+          cd tests/
+          pytest -v -s test_url_filter_lambda_on_localstack.py
+      - name: Stop LocalStack
+        run: |
+          cd tests/
+          docker-compose -f docker-compose.yaml down
 
   deply-staging:
     name: Deploy to staging
+    needs: test-lambda
     if: contains(github.event.ref, '-sprint-')
     environment:
       name: staging-url-filter
@@ -28,16 +74,20 @@ jobs:
         AWS_DEFAULT_REGION: ${{ secrets.REGION }}
 
   deploy-production:
-    runs-on: ubuntu-latest
+    name: Deploy to production
+    needs: test-lambda
     if: github.event.ref == 'refs/heads/master'
+    environment:
+      name: production-url-filter
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
     - name: Deploy code to Lambda
       uses: qxf2/py-lambda-action@v1.0.3
       with:
         lambda_directory: 'url_filtering_lambda_rohini'
-        lambda_function_name: 'arn:aws:lambda:ap-south-1:285993504765:function:URLFilteringLambdaRohini'
-        lambda_layer_arn: 'arn:aws:lambda:ap-south-1:285993504765:layer:rohinilayer'
+        lambda_function_name: ${{secrets.ARN }}
+        lambda_layer_arn: ${{ secrets.LAYER_ARN }}
         requirements_txt: 'url_filtering_lambda_rohini/requirements.txt'
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
