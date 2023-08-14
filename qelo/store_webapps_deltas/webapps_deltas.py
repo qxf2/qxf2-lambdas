@@ -14,51 +14,35 @@ sys.path.append((os.path.dirname(os.path.abspath(__file__))))
 import dynamodb_functions as df
 import api_functions as af
 
-def build_report_requests(view_id, date):
-    "Defines the reportRequests for each webapps sub-stream and returns the JSON."
-    metrics_list = ['ga:users']
-    body = {'reportRequests': [{\
-            'viewId': view_id,\
-            'dateRanges': [{'startDate': date, 'endDate': date}],\
-            'metrics': [{'expression': metric} for metric in metrics_list]}]}
-    return body
-
 def normalize_response(response):
-    "Parses the Google Analytics API response to extract the users count for the webapp."
-    for report in response.get('reports', []):
-        data = report.get('data', {})
-        totals = data.get('totals', [])
-    for total in totals:
-        values = total['values']
-        user_count = values[0]
+    "Parses Google Analytics Data API v1 response and extracts total users count for web-app."
+    user_count = 0
+    for row in response.rows:
+        user_count = row.metric_values[0].value
     return user_count
 
 def get_webapps_substreams():
     "Fetches the webapps defined in the JSON."
     root_dir = os.path.dirname(os.path.abspath(__file__))
     webapps_substreams_json = os.path.join(root_dir, 'conf', 'webapps_conf.json')
-    with open(webapps_substreams_json) as file:
+    with open(webapps_substreams_json, encoding='utf-8') as file:
         substreams = json.load(file)
     return substreams
 
 def get_webapps_stats():
-    "Returns the stats for every configured webapps."
+    "Returns the stats for every configured webapps"
     stats = []
     yesterday_date = (datetime.datetime.now()-datetime.timedelta(1)).strftime('%Y-%m-%d')
     all_apps = get_webapps_substreams()
     all_apps = all_apps.get('webapps', [])
     store_substreams(yesterday_date, all_apps)
     for web_app in all_apps:
-        # Build the JSON for the reportRequests.
-        report_requests_body = build_report_requests(web_app['view_id'], yesterday_date)
-        # Get the API response for the defined reportRequests.
-        api_response = af.get_api_response(report_requests_body)
-        # Extract web app users count from the Google Analytics API reponse.
-        users = normalize_response(api_response)
-        # Build the web app stats.
+        api_response = af.get_data_api_response(web_app['property_id'], yesterday_date)
+        users_count = normalize_response(api_response)
+        # Build the web apps stats
         stats.append({'date':yesterday_date,\
                       'webapp_name':web_app['app_name'],\
-                      'users_count':users
+                      'users_count':users_count
                       })
     store_webapp_stats_as_deltas(stats)
 

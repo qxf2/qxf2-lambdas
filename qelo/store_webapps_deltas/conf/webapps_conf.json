@@ -1,18 +1,14 @@
 {
     "webapps":[
     {"app_name": "Database trainer",
-     "view_id": "214412698"},
+     "property_id": "391331833"},
     {"app_name": "QA Interview Application",
-    "view_id": "178172806"},
+    "property_id": "368011034"},
     {"app_name": "QXf2 Trainer",
-    "view_id": "182188520"},
-    {"app_name": "the-bored-qa",
-    "view_id": "222974048"},
+    "property_id": "391318124"},
     {"app_name": "Weather Shopper",
-    "view_id": "240047836"},
+    "property_id": "361260080"},
     {"app_name": "Interview Scheduler",
-    "view_id": "240213568"},
-    {"app_name": "How am I doing?",
-    "view_id": "240208632"}
+    "property_id": "362478383"}
     ]
 }
