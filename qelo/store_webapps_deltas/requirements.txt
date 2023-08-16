@@ -1,1 +1,1 @@
-google-analytics-data>=0.17.1
+google-analytics-data==0.12.1
