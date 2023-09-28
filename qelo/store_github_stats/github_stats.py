@@ -5,6 +5,7 @@ Collect and store the GitHub stats for all Qxf2 repositories
 This script is meant to be run daily at 11pm UST (ie 4.30am IST)
 """
 from datetime import datetime
+import json
 import os
 import time
 from github import Github
@@ -52,6 +53,7 @@ def prepare_stats(date, repos):
 
 def lambda_handler(event, context):
     "Entry point for Lambda execution"
+    response = {}
     for retry_count in range(int(os.environ["RETRIES_COUNT"])):
         try:
             print(f'Retry attempt : {retry_count}')
@@ -65,6 +67,12 @@ def lambda_handler(event, context):
                                             os.environ["GITHUB_SUBSTREAMS_TABLE"])
             dynamodb_functions.write_into_table(stats_data,
                                             os.environ["GITHUB_STATS_TABLE"])
+            response = {
+                'statusCode': 200,
+                'body': json.dumps({
+                    'message' : 'github-stats-prod lambda executed successully!',
+                    'status_flag' : 1})
+            }
             break
         except Exception as error:
             print(f'Exception : {error}')

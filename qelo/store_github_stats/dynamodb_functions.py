@@ -12,8 +12,8 @@ def init_table(table_name):
 
 def write_into_table(items, table_name):
     "Writes items/records into DynamoDB table"
-    table = init_table(table_name)
     try:
+        table = init_table(table_name)
         with table.batch_writer() as batch:
             for item in items:
                 batch.put_item(Item=item)
