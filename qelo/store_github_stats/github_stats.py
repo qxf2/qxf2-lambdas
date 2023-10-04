@@ -71,10 +71,11 @@ def lambda_handler(event, context):
                 'statusCode': 200,
                 'body': json.dumps({
                     'message' : 'github-stats-prod lambda executed successully!',
-                    'status_flag' : 1})
+                    'stats_status_flag' : 1})
             }
             break
         except Exception as error:
             print(f'Exception : {error}')
             time.sleep(10)
             continue
+    return response
