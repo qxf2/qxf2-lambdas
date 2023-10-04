@@ -2,6 +2,8 @@
 Lambda function to store the GitHub substreams scores into DynamoDB every night.
 """
 import datetime
+import json
+import os
 from decimal import Decimal
 import dynamodb_functions as df
 
