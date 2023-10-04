@@ -3,7 +3,6 @@ Lambda function to store the GitHub substreams scores into DynamoDB every night.
 """
 import datetime
 from decimal import Decimal
-import github_conf as gc
 import dynamodb_functions as df
 
 def get_deltas_sum(substreams_deltas):
@@ -70,8 +69,8 @@ def calculate_substreams_scores():
     deltas_sum = []
     today = datetime.datetime.now().strftime('%d-%b-%Y')
     # Get current day deltas for all github sub-streams.
-    current_day_substreams = df.read_substreams(gc.GITHUB_SUBSTREAMS_TABLE, today)
-    current_day_substreams_deltas = df.read_github_table(gc.GITHUB_DELTAS_TABLE, today,\
+    current_day_substreams = df.read_substreams(os.environ["GITHUB_SUBSTREAMS_TABLE"], today)
+    current_day_substreams_deltas = df.read_github_table(os.environ["GITHUB_DELTAS_TABLE"], today,\
                                                     current_day_substreams)
     # Get the sum of all substreams deltas.
     deltas_sum = get_deltas_sum(current_day_substreams_deltas)
@@ -102,9 +101,15 @@ def store_substreams_scores():
     "Stores the GitHub sub-stream scores into DynamoDB."
     substreams_scores = []
     substreams_scores = calculate_substreams_scores()
-    df.write_into_table(substreams_scores, gc.GITHUB_SCORES_TABLE)
+    df.write_into_table(substreams_scores, os.environ["GITHUB_SCORES_TABLE"])
 
 def lambda_handler(event, context):
     "Lambda entry point."
     store_substreams_scores()
-    return "Stored current day GitHub substreams scores, successfully into DynamoDB."
+    response = {
+                'statusCode': 200,
+                'body': json.dumps({
+                    'message' : 'github-scores lambda executed successully!',
+                    'scores_status_flag' : 1})
+            }
+    return response
