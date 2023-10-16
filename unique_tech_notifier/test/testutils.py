@@ -10,8 +10,8 @@ import botocore
 
 # Specify the paths and configuration
 LAMBDA_ZIP='lambda_with_dependency.zip'
-LAMBDA_FOLDER_PATH = '../unique_tech_notifier'
-REQUIREMENTS_FILE_PATH = '../unique_tech_notifier/requirements.txt'
+LAMBDA_FOLDER_PATH = './'
+REQUIREMENTS_FILE_PATH = './requirements.txt'
 CONFIG = botocore.config.Config(retries={'max_attempts': 0})
 LOCALSTACK_ENDPOINT = 'http://localhost.localstack.cloud:4566'
 

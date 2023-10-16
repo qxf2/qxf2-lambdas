@@ -8,6 +8,7 @@ import json
 import requests
 import boto3
 
+
 QUEUE_URL = 'https://sqs.ap-south-1.amazonaws.com/285993504765/skype-sender'
 ALL_TECH_URL = os.environ.get('ALL_TECH_URL')
 WEEKLY_TECH_URL = os.environ.get('WEEKLY_TECH_URL')
@@ -32,12 +33,12 @@ def write_message(message, channel):
 def get_all_techs():
     "Returns a list of technology data"
     end_date = str(date.today() - timedelta(days=5))
-    all_tech = requests.post(
+    all_tech_response = requests.get(
         ALL_TECH_URL,
-        headers={"Accept":"application/json", "User":AUTHORIZED_USER},
-        data=json.dumps({"start_date":"2014-01-01", "end_date":end_date}))
-    print(all_tech.text)
-    tech_list = [tech['technology'] for tech in all_tech.json()]
+        headers={"Accept": "application/json", "User": AUTHORIZED_USER},
+        data=json.dumps({"start_date": "2014-01-01", "end_date": end_date}))
+    all_tech = json.loads(all_tech_response.text)
+    tech_list = [tech.get('technology') for tech in all_tech if 'technology' in tech]
     return tech_list
 
 
@@ -57,11 +58,10 @@ def get_weekly_tech():
 
 
 def get_unique_tech():
-    "Retun weekly unique tech"
+    "Return weekly unique tech"
     unique_tech_list = set(get_weekly_tech()) - set(get_all_techs())
     if len(unique_tech_list) != 0:
-        msg = "List of unique techs learnt this week:\n"+"\n".join(unique_tech_list)
-        print(unique_tech_list.text)
+        msg = "List of unique techs learnt this week:\n" + "\n".join(unique_tech_list)
     else:
         msg = "*No unique techs* learnt this week!! :("
     return msg

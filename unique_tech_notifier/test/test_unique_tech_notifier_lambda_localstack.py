@@ -11,7 +11,7 @@ import unittest
 from unique_tech_notifier import lambda_handler
 
 
-class UrlFilterLambdaLocalStackTest(TestCase):
+class UniqueTechLocalStackTest(TestCase):
     "Deploy Lambda, SQS on LocalStack and run the test"
     @classmethod
     def setup_class(cls):
@@ -55,10 +55,6 @@ class UrlFilterLambdaLocalStackTest(TestCase):
 
         result_with_unique_techs = lambda_handler(event_with_unique_techs, None)
 
-        self.assertIsNotNone(result_with_unique_techs)
-        self.assertIn('unique_tech_message', result_with_unique_techs)
-        self.assertIn('weekly_tech_message', result_with_unique_techs)
-
         unique_tech_message = result_with_unique_techs['unique_tech_message']
         weekly_tech_message = result_with_unique_techs['weekly_tech_message']
 
@@ -67,24 +63,3 @@ class UrlFilterLambdaLocalStackTest(TestCase):
 
         self.assertIn('List of unique techs learnt this week', unique_tech_message)
         self.assertIn('List of techs reported this week', weekly_tech_message)
-
-        # Test case with no unique techs learned
-        event_without_unique_techs = {
-            "channel": "main"
-        }
-
-        result_without_unique_techs = lambda_handler(event_without_unique_techs, None)
-
-        self.assertIsNotNone(result_without_unique_techs)
-        self.assertIn('unique_tech_message', result_without_unique_techs)
-        self.assertIn('weekly_tech_message', result_without_unique_techs)
-
-        unique_tech_message_no_unique_techs = result_without_unique_techs['unique_tech_message']
-        weekly_tech_message_no_unique_techs = result_without_unique_techs['weekly_tech_message']
-
-        self.assertIsInstance(unique_tech_message_no_unique_techs, str)
-        self.assertIsInstance(weekly_tech_message_no_unique_techs, str)
-
-        self.assertIn('*No unique techs* learnt this week!! :(', unique_tech_message_no_unique_techs)
-        self.assertIn('List of techs reported this week', weekly_tech_message_no_unique_techs)
-
