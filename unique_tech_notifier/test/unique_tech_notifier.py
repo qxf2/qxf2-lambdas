@@ -14,11 +14,19 @@ WEEKLY_TECH_URL = os.environ.get('WEEKLY_TECH_URL')
 AUTHORIZED_USER = os.environ.get('AUTHORIZED_USER')
 
 
-def write_message(unique_tech_msg, channel):
+def write_message(message, channel):
     "Send a message to Skype Sender"
     sqs = boto3.client('sqs')
-    message = str({'msg':f'{unique_tech_msg}', 'channel':channel})
-    sqs.send_message(QueueUrl=QUEUE_URL, MessageBody=(message))
+    # Check if running on localstack or production environment
+    is_localstack = os.environ.get('LOCALSTACK_ENV') == 'true'
+
+    if is_localstack:
+        sqs = boto3.client('sqs',endpoint_url= 'http://localstack:4566')
+    else:
+        sqs = boto3.client('sqs')
+    print(channel)
+    message = str({'msg':f'{message}', 'channel':channel})
+    print(message)
 
 
 def get_all_techs():
@@ -28,6 +36,7 @@ def get_all_techs():
         ALL_TECH_URL,
         headers={"Accept":"application/json", "User":AUTHORIZED_USER},
         data=json.dumps({"start_date":"2014-01-01", "end_date":end_date}))
+    print(all_tech.text)
     tech_list = [tech['technology'] for tech in all_tech.json()]
     return tech_list
 
@@ -42,6 +51,7 @@ def get_weekly_tech():
             "Accept":"application/json",
             "Content-type":"application/json",
             "User":AUTHORIZED_USER})
+    print(weekly_tech.text)
     weekly_tech_list = [tech['Technology'] for tech in weekly_tech.json()]
     return weekly_tech_list
 
@@ -51,18 +61,24 @@ def get_unique_tech():
     unique_tech_list = set(get_weekly_tech()) - set(get_all_techs())
     if len(unique_tech_list) != 0:
         msg = "List of unique techs learnt this week:\n"+"\n".join(unique_tech_list)
+        print(unique_tech_list.text)
     else:
         msg = "*No unique techs* learnt this week!! :("
     return msg
 
 
 def lambda_handler(event, context):
-    "lambda entry point"
-    message = get_unique_tech()
-    write_message(message, event.get('channel', 'main'))
+    "Lambda entry point"
+    unique_tech_message = get_unique_tech()
+    print("Unique Tech Message:", unique_tech_message)
     weekly_tech_list = set(get_weekly_tech())
     if len(weekly_tech_list) != 0:
-        msg = "List of techs reported this week:\n"+"\n".join(weekly_tech_list)
+        msg = "List of techs reported this week:\n" + "\n".join(weekly_tech_list)
     else:
         msg = "*No techs* reported this week!! :("
-    write_message(msg, event.get('channel', 'main'))
+    print("Weekly Tech Message:",msg)
+    return {
+        'unique_tech_message': unique_tech_message,
+        'weekly_tech_message': msg
+    }
+    
