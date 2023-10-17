@@ -126,9 +126,9 @@ def create_lambda(function_name):
         Timeout=180,
         Environment={
             'Variables': {
-                'ALL_TECH_URL': 'http://localhost:8000/survey/admin/QElo_filter_technology',
-                'WEEKLY_TECH_URL': 'http://localhost:8000/survey/admin/techs_learnt_on_week',
-                'AUTHORIZED_USER': 'dummy-key',
+                'ALL_TECH_URL': os.environ.get('ALL_TECH_URL'),
+                'WEEKLY_TECH_URL': os.environ.get('WEEKLY_TECH_URL'),
+                'AUTHORIZED_USER': os.environ.get('AUTHORIZED_USER'),
                 'LOCALSTACK_ENV': 'true'
             }
         }
@@ -159,7 +159,5 @@ def invoke_function_and_get_message(function_name, event):
     # Parse the response from the Lambda function
     response_payload = response['Payload'].read().decode('utf-8')
     response_data = json.loads(response_payload)
-    print ("response data:", response_data)
-
     return response_data
     

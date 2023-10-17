@@ -8,7 +8,6 @@ import json
 import requests
 import boto3
 
-
 QUEUE_URL = 'https://sqs.ap-south-1.amazonaws.com/285993504765/skype-sender'
 ALL_TECH_URL = os.environ.get('ALL_TECH_URL')
 WEEKLY_TECH_URL = os.environ.get('WEEKLY_TECH_URL')
@@ -28,7 +27,6 @@ def write_message(message, channel):
     print(channel)
     message = str({'msg':f'{message}', 'channel':channel})
     print(message)
-
 
 def get_all_techs():
     "Returns a list of technology data"
@@ -52,16 +50,15 @@ def get_weekly_tech():
             "Accept":"application/json",
             "Content-type":"application/json",
             "User":AUTHORIZED_USER})
-    print(weekly_tech.text)
     weekly_tech_list = [tech['Technology'] for tech in weekly_tech.json()]
     return weekly_tech_list
 
 
 def get_unique_tech():
-    "Return weekly unique tech"
+    "Retun weekly unique tech"
     unique_tech_list = set(get_weekly_tech()) - set(get_all_techs())
     if len(unique_tech_list) != 0:
-        msg = "List of unique techs learnt this week:\n" + "\n".join(unique_tech_list)
+        msg = "List of unique techs learnt this week:\n"+"\n".join(unique_tech_list)
     else:
         msg = "*No unique techs* learnt this week!! :("
     return msg
@@ -75,10 +72,9 @@ def lambda_handler(event, context):
     if len(weekly_tech_list) != 0:
         msg = "List of techs reported this week:\n" + "\n".join(weekly_tech_list)
     else:
-        msg = "*No techs* reported this week!! :("
+        msg = "*No unique techs* learnt this week!! :("
     print("Weekly Tech Message:",msg)
     return {
         'unique_tech_message': unique_tech_message,
         'weekly_tech_message': msg
     }
-    
