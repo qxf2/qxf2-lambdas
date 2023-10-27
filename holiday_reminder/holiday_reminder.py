@@ -52,7 +52,7 @@ def get_holidays():
             else:
                 end_string = 'Kindly inform the client about it right now'
 
-            if delta.days in (7, 3):
+            if delta.days in (7 , 3):
                 msg += (f"\n Reminder - {delta.days} days from now {date} is a {name} {key} "
                         f"holiday. {end_string}")
     return msg.replace("'","")
