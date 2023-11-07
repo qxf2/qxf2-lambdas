@@ -61,9 +61,9 @@ def lambda_handler(event, context):
     write_message(message, event.get('channel','main'))
     weekly_tech_list = set(get_weekly_tech())
     if len(weekly_tech_list) != 0:
-        msg = "List of techs reported this week:\n" + "\n".join(weekly_tech_list)
+        msg = "List of techs reported this week:\n"+"\n".join(weekly_tech_list)
     else:
-        msg = "*No unique techs* learnt this week!! :("
+        msg = "*No techs* reported this week!! :("
     write_message(msg, event.get('channel','main'))
     return {
         'unique_tech': message,
