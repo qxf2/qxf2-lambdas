@@ -5,19 +5,19 @@ This Lambda will :
 import json
 import os
 import boto3
-QUEUE_URL = 'https://sqs.ap-south-1.amazonaws.com/285993504765/skype-sender'
-at_Qxf2Bot = '<at id="8:live:.cid.92bd244e945d8335">qxf2bot</at>!'
-at_Qxf2Bot_english = '@qxf2bot!'
-COMMANDS = [f'comment reviewers, please {at_Qxf2Bot}',
-            f'i need comment reviewers {at_Qxf2Bot}',
-            f'comment reviewers please {at_Qxf2Bot}',
-            f'comment reviewers, please {at_Qxf2Bot_english}',
-            f'i need comment reviewers {at_Qxf2Bot_english}',
-            f'comment reviewers please {at_Qxf2Bot_english}']
+QUEUE_URL = os.environ.get('SKYPE_SENDER_QUEUE_URL')
+AT_QXF2BOT = '<at id="8:live:.cid.92bd244e945d8335">qxf2bot</at>!'
+AT_QXF2BOT_ENGLISH = '@qxf2bot!'
+COMMANDS = [f'comment reviewers, please {AT_QXF2BOT}',
+            f'i need comment reviewers {AT_QXF2BOT}',
+            f'comment reviewers please {AT_QXF2BOT}',
+            f'comment reviewers, please {AT_QXF2BOT_ENGLISH}',
+            f'i need comment reviewers {AT_QXF2BOT_ENGLISH}',
+            f'comment reviewers please {AT_QXF2BOT_ENGLISH}']
 FIRST_SSM = 'first_comment_reviewer_index'
 SECOND_SSM = 'second_comment_reviewer_index'
-RESET_COMMANDS = [f'reset primary code reviewer {at_Qxf2Bot}',
-                f'reset secondary code reviewer {at_Qxf2Bot}']
+RESET_COMMANDS = [f'reset primary code reviewer {AT_QXF2BOT}',
+                f'reset secondary code reviewer {AT_QXF2BOT}']
 
 
 def read_parameter(client, parameter_name, decryption_flag = False):
@@ -34,20 +34,20 @@ def write_parameter(client, parameter_name, value, decryption_flag = False):
         Overwrite = True
     )
 
-    return True if response['ResponseMetadata']['HTTPStatusCode'] == 200 else False
+    return response['ResponseMetadata']['HTTPStatusCode'] == 200
 
 def get_reviewer_index(reviewer_type):
     "Return the index of the reviewer"
     client = boto3.client("ssm")
     reviewer_index = read_parameter(client, reviewer_type)
-    
+
     return int(reviewer_index)
 
 def update_reviewer_index(reviewer_type,increment=1):
     "Increment the reviewer index by 1"
     client = boto3.client("ssm")
     reviewer_index = read_parameter(client, reviewer_type)
-    write_parameter(client, 
+    write_parameter(client,
     reviewer_type,
     str(int(reviewer_index) + increment))
 
@@ -92,8 +92,11 @@ def get_reply():
     secondary_index = get_reviewer_index(SECOND_SSM)
     first_comment_reviewer = first_comment_reviewers[primary_index%len(first_comment_reviewers)]
     second_comment_reviewer = second_comment_reviewers[secondary_index%len(second_comment_reviewers)]
-    reply = f'First comment reviewer: {first_comment_reviewer}\n\nSecond comment reviewer: {second_comment_reviewer}\n'
-    
+    reply = (
+            f'First comment reviewer: {first_comment_reviewer}\n\n'
+            f'Second comment reviewer: {second_comment_reviewer}\n'
+    )
+
     return reply
 
 def update_reviewer_indexes():
