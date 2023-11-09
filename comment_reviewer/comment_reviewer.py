@@ -66,7 +66,11 @@ def get_message_contents(event):
 
 def write_message(message, channel):
     "Send a message to Skype Sender"
-    sqs = boto3.client('sqs')
+    is_localstack = os.environ.get('LOCALSTACK_ENV') == 'true'
+    if is_localstack:
+        sqs = boto3.client('sqs',endpoint_url= 'http://localstack:4566')
+    else:
+        sqs = boto3.client('sqs')
     print(channel)
     message = str({'msg':f'{message}', 'channel':channel})
     print(message)
