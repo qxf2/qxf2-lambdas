@@ -46,7 +46,7 @@ def ask_the_all_knowing_one(input_message, max_tokens=512):
     "Return the ChatGPT response"
     openai.api_key = os.environ.get('CHATGPT_API_KEY', '')
     model_engine = os.environ.get('CHATGPT_VERSION', 'gpt-3.5-turbo')
-
+    summary_and_title = ''
     input_message = "I want you to format your reply in a specific manner to this request." \
                     "I am going to send you an article (in quotes at the end of this message)." \
                     "You tell me its title and summary." \
@@ -55,15 +55,23 @@ def ask_the_all_knowing_one(input_message, max_tokens=512):
                     "and preface the summary with the exact string SUMMARY:" \
                     "If you do not know, then put TITLE: UNKNOWN and SUMMARY: UNKNOWN." \
                     f"Ok, here is the article '{input_message}'"
+    try:
+        if openai.api_key.strip():
+            response = openai.ChatCompletion.create(
+                    model=model_engine,
+                    messages=[
+                        {"role": "user", "content": input_message},
+                    ],
+                    max_tokens=max_tokens
+                )
+            summary_and_title = response["choices"][0]["message"]["content"]
+        else:
+            print('ChatGPT skipped since no key is setup.')
+    except Exception as e:
+        print('Unable to make call to ChatGPT.')
+        print(f'Python says: {e}')
 
-    response = openai.ChatCompletion.create(
-            model=model_engine,
-            messages=[
-                {"role": "user", "content": input_message},
-            ],
-            max_tokens=max_tokens
-        )
-    return response["choices"][0]["message"]["content"]
+    return summary_and_title
 
 def get_title_summary(article_url):
     "Ask ChatGPT for the title and summary"
