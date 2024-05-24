@@ -78,7 +78,7 @@ jobs:
     needs: test-lambda
     if: github.event.ref == 'refs/heads/master'
     environment:
-      name: production-url-filter
+      name: production
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
