@@ -44,7 +44,7 @@ def process_reply(reply):
 
 def ask_the_all_knowing_one(input_message, max_tokens=512):
     "Return the ChatGPT response"
-    openai.api_key = 'ak-1viMSg3Mtk2vK76WQMEiT3BlbkFJFo4njQoZ3oLcnnhTlL6v'
+    openai.api_key = os.environ.get('CHATGPT_API_KEY', '')
     model_engine = os.environ.get('CHATGPT_VERSION', 'gpt-3.5-turbo')
     summary_and_title = ''
     input_message = "I want you to format your reply in a specific manner to this request." \
