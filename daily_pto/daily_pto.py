@@ -1,18 +1,17 @@
 """
-Get PTO names from the google calender
-And post to Skype Sender
+Get PTO names from the google calender and post them to Skype Sender.
+This script uses the Google Calendar API to fetch PTO events 
+from shared calendars and posts the names of individuals on PTO to a Skype channel via AWS SQS.
 """
 
 from __future__ import print_function
-import httplib2
 import os
 import json
 import boto3
 import datetime
 from google.oauth2 import service_account
-from oauth2client.service_account import ServiceAccountCredentials
 import googleapiclient.discovery
- 
+
 # If modifying these scopes, delete your previously saved credentials
 # at ~/.credentials/client_secret_google_calendar.json
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
@@ -20,15 +19,18 @@ CLIENT_SECRET_FILE = json.loads(os.environ['client_secret_google_calendar'])
 QUEUE_URL = 'https://sqs.ap-south-1.amazonaws.com/285993504765/skype-sender'
 
 def main():
-    """Shows basic usage of the Google Calendar API.
-    Creates a Google Calendar API service object and outputs a list of the next
-    10 events on the user's calendar.
     """
-    credentials = service_account.Credentials.from_service_account_info(CLIENT_SECRET_FILE, scopes=SCOPES)
-    delegated_credentials = credentials.with_subject('mohan@qxf2.com')
-    service = googleapiclient.discovery.build('calendar', 'v3', credentials=delegated_credentials, cache_discovery=False) 
+    Fetches and returns a list of PTO names for today from Google Calendar.
+    Authenticates via service account, retrieves calendar IDs, and filters PTO events.
+    """
+    credentials = service_account.Credentials.from_service_account_info(CLIENT_SECRET_FILE,
+                                                                        scopes=SCOPES)
+    delegated_credentials = credentials.with_subject('test@qxf2.com')
+    service = googleapiclient.discovery.build('calendar', 'v3',
+                                              credentials=delegated_credentials,
+                                              cache_discovery=False)
 
-    # This code is to fetch the calendar ids shared with me
+    # Fetch calendar IDs shared/subscribed with the test qxf2 user
     # Src: https://developers.google.com/google-apps/calendar/v3/reference/calendarList/list
     page_token = None
     calendar_ids = []
@@ -42,7 +44,7 @@ def main():
         if not page_token:
             break
 
-    # This code is to look for all-day events in each calendar for the month and filter out PTO events
+    # Fetch the PTO events for today from each calendar and filter out PTO events
     # Src: https://developers.google.com/google-apps/calendar/v3/reference/events/list
     # You need to get this from command line
     now = datetime.datetime.now() # current date and time
