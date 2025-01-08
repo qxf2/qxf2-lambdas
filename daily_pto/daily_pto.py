@@ -7,8 +7,8 @@ from shared calendars and posts the names of individuals on PTO to a Skype chann
 from __future__ import print_function
 import os
 import json
-import boto3
 import datetime
+import boto3
 from google.oauth2 import service_account
 import googleapiclient.discovery
 
@@ -46,8 +46,7 @@ def main():
 
     # Fetch the PTO events for today from each calendar and filter out PTO events
     # Src: https://developers.google.com/google-apps/calendar/v3/reference/events/list
-    # You need to get this from command line
-    now = datetime.datetime.now() # current date and time
+    now = datetime.datetime.now()
     year = int (now.strftime("%Y"))
     month = int (now.strftime("%m"))
     date = int (now.strftime("%d"))
@@ -79,6 +78,10 @@ def write_message(daily_message, channel):
 
 def lambda_handler(event, context):
     "Lambda entry point"
-    pto_list = main() 
-    message = 'PTO today:\n{}'.format("\n".join(pto_list[0:]))
-    write_message(message, event.get('channel','test'))
+    pto_list = main()
+    if pto_list:
+        message = 'PTO today:\n{}'.format("\n".join(pto_list))
+    else:
+        message = "No PTO's today."
+    channel = event.get('channel', os.environ.get('MAIN_CHANNEL'))
+    write_message(message, channel)
