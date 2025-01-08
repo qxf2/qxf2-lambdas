@@ -83,5 +83,5 @@ def lambda_handler(event, context):
         message = 'PTO today:\n{}'.format("\n".join(pto_list))
     else:
         message = "No PTO's today."
-    channel = event.get('channel', os.environ.get('MAIN_CHANNEL'))
-    write_message(message, channel)
+    MAIN_CHANNEL = os.environ.get('MAIN_CHANNEL')
+    write_message(message, event.get('channel', MAIN_CHANNEL))
