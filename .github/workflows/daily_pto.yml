@@ -2,7 +2,7 @@ name: daily-pto-deploy
 on:
   push:
     branches:
-      - master
+      - daily_pto
     paths:
       - 'daily_pto/**'
 jobs:

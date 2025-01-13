@@ -21,7 +21,7 @@ QUEUE_URL = 'https://sqs.ap-south-1.amazonaws.com/285993504765/skype-sender'
 def main():
     """
     Fetches and returns a list of PTO names for today from Google Calendar.
-    Authenticates via service account, retrieves calendar IDs, and filters PTO events.
+    Authenticates via service account, retrieves calendar IDs, and filters PTO event.
     """
     credentials = service_account.Credentials.from_service_account_info(CLIENT_SECRET_FILE,
                                                                         scopes=SCOPES)
@@ -82,6 +82,6 @@ def lambda_handler(event, context):
     if pto_list:
         message = 'PTO today:\n{}'.format("\n".join(pto_list))
     else:
-        message = "No PTO's today."
+        message = 'No PTO today.'
     MAIN_CHANNEL = os.environ.get('MAIN_CHANNEL')
     write_message(message, event.get('channel', MAIN_CHANNEL))
